@@ -267,9 +267,9 @@
             fmt(x.size) +
             '</div><div class="muted date">' +
             new Date(x.modified).toLocaleString() +
-            '</div><div class=ops><button onclick="download(' +
-            JSON.stringify(x.name) +
-            ')">下载</button><button type=button class=alt data-delete="' +
+            '</div><div class=ops><button type=button data-download="' +
+            esc(x.name) +
+            '">下载</button><button type=button class=alt data-delete="' +
             esc(x.name) +
             '">删除</button></div></div>',
         )
@@ -363,6 +363,11 @@
     }
     $("back").onclick = goBack;
     $("items").onclick = (e) => {
+      let downloadButton = e.target.closest("[data-download]");
+      if (downloadButton) {
+        download(downloadButton.dataset.download);
+        return;
+      }
       let button = e.target.closest("[data-delete]");
       if (button) {
         removeFile(button.dataset.delete, button);
