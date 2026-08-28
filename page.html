@@ -117,6 +117,25 @@
       cursor: pointer;
       font-size: 13px;
     }
+    button.action {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 9px;
+      border: 1px solid #d7dce5;
+      border-radius: 7px;
+      background: #fff;
+      color: #315da8;
+      text-decoration: none;
+      line-height: 1;
+    }
+    button.action:hover {
+      border-color: #aeb8ca;
+      background: #f6f8fc;
+    }
+    button.action.danger {
+      color: #b04452;
+    }
     label {
       display: block;
       color: #0645ad;
@@ -272,7 +291,9 @@
         ><button type="button" id="back" hidden>返回上级</button>
         <span id="crumb" class="muted">根目录</span></span
       ><span
-        ><button type="button" id="mkdir">新建目录</button>
+        ><button type="button" class="action" id="mkdir">
+          <span aria-hidden="true">＋</span>新建目录
+        </button>
         <span id="usage" class="muted"></span
       ></span>
     </div>
@@ -349,11 +370,11 @@
             fmt(x.size) +
             '</div><div class="muted date">' +
             new Date(x.modified).toLocaleString() +
-            '</div><div class=ops><button onclick="download(' +
+            '</div><div class=ops><button class=action onclick="download(' +
             JSON.stringify(x.name) +
-            ')">下载</button><button type=button class=alt data-delete="' +
+            ')"><span aria-hidden="true">⇩</span>下载</button><button type=button class="action danger" data-delete="' +
             esc(x.name) +
-            '">删除</button></div></div>',
+            '"><span aria-hidden="true">⌫</span>删除</button></div></div>',
         )
         .join("");
       $("items").innerHTML = h || "<div class=empty>暂无文件</div>";
@@ -397,7 +418,7 @@
       } catch (e) {
         if (button) {
           button.disabled = false;
-          button.textContent = "删";
+          button.innerHTML = '<span aria-hidden="true">⌫</span>删除';
         }
         alert(e.message);
       }
