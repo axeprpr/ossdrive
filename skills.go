@@ -10,7 +10,7 @@ import (
 var skillInstructions []byte
 
 func skills(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/skills.md" {
+	if r.URL.Path != "/skills" && r.URL.Path != "/skills.md" {
 		http.NotFound(w, r)
 		return
 	}

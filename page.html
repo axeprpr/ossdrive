@@ -91,6 +91,14 @@
       padding: 9px 10px;
       border-bottom: 1px solid #eee;
       align-items: center;
+      transition: background-color 0.15s ease;
+    }
+    .row[data-folder],
+    .row[data-download] {
+      cursor: pointer;
+    }
+    .row:not(.muted):hover {
+      background: #f5f8fc;
     }
     .row:last-child {
       border: 0;
@@ -99,6 +107,7 @@
       color: #2866d8;
       cursor: pointer;
       font-weight: 600;
+      text-decoration: none;
     }
     .folder:hover {
       text-decoration: underline;
@@ -161,6 +170,17 @@
       text-align: center;
       padding: 28px;
       color: #888;
+    }
+    .skills-help {
+      margin: 18px auto 28px;
+      max-width: 760px;
+      padding: 0 14px;
+      color: #8a94a3;
+      font-size: 12px;
+      text-align: center;
+    }
+    .skills-help a {
+      color: inherit;
     }
     .mkdir-form {
       display: none;
@@ -322,6 +342,10 @@
       <div id="items"></div>
     </section>
   </main>
+  <p class="skills-help">
+    访问 <a href="/skills" target="_blank" rel="noopener">f.axe3.cn:5000/skills</a>
+    获取文件中转方式；需要文件中转时，请将此链接发送给大模型。
+  </p>
   <script>
     let cur = "";
     const directoryPattern = /^[\u4e00-\u9fffA-Za-z0-9_-]{1,64}$/;
@@ -354,9 +378,9 @@
       let h = d.folders
         .map(
           (f) =>
-            '<div class=row><div class="name folder" data-folder="' +
+            '<div class="row" data-folder="' +
             esc(f) +
-            '">📁 ' +
+            '"><div class="name folder">📁 ' +
             esc(f) +
             "</div><div></div><div class=date></div><div></div></div>",
         )
@@ -364,15 +388,15 @@
       h += d.files
         .map(
           (x) =>
-            "<div class=row><div class=name>📄 " +
+            '<div class="row" data-download="' +
+            esc(x.name) +
+            '"><div class=name>📄 ' +
             esc(x.name) +
             "</div><div class=muted>" +
             fmt(x.size) +
             '</div><div class="muted date">' +
             new Date(x.modified).toLocaleString() +
-            '</div><div class=ops><button class=action onclick="download(' +
-            JSON.stringify(x.name) +
-            ')"><span aria-hidden="true">⇩</span>下载</button><button type=button class="action danger" data-delete="' +
+            '</div><div class=ops><button type=button class=action><span aria-hidden="true">⇩</span>下载</button><button type=button class="action danger" data-delete="' +
             esc(x.name) +
             '"><span aria-hidden="true">⌫</span>删除</button></div></div>',
         )
@@ -472,7 +496,12 @@
         return;
       }
       let folder = e.target.closest("[data-folder]");
-      if (folder) openFolder(folder.dataset.folder);
+      if (folder) {
+        openFolder(folder.dataset.folder);
+        return;
+      }
+      let file = e.target.closest("[data-download]");
+      if (file) download(file.dataset.download);
     };
     $("mkdir").onclick = () => {
       $("mkdir-form").style.display = "flex";
