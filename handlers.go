@@ -72,6 +72,9 @@ func (a *app) list(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, object := range listing.Objects {
+			if strings.HasSuffix(object.Key, "/") {
+				continue
+			}
 			result.Usage += int64(object.Size)
 			name := strings.TrimPrefix(a.relative(object.Key), current+"/")
 			if strings.Contains(name, "/") {
