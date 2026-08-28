@@ -123,6 +123,20 @@
       padding: 28px;
       color: #888;
     }
+    .mkdir-form {
+      display: none;
+      margin: 12px 0;
+      gap: 8px;
+      align-items: center;
+    }
+    .mkdir-form input {
+      display: block;
+      width: 220px;
+      padding: 6px 8px;
+      border: 1px solid #c8ced8;
+      border-radius: 7px;
+      font: inherit;
+    }
     input {
       display: none;
     }
@@ -152,6 +166,11 @@
         ><button type="button" id="mkdir">新建目录</button>
         <span id="usage" class="muted"></span
       ></span>
+    </div>
+    <div id="mkdir-form" class="mkdir-form">
+      <input id="mkdir-name" type="text" placeholder="目录名称" />
+      <button type="button" id="mkdir-submit">创建</button>
+      <button type="button" id="mkdir-cancel">取消</button>
     </div>
     <section class="list">
       <div class="row muted">
@@ -308,9 +327,18 @@
       let folder = e.target.closest("[data-folder]");
       if (folder) openFolder(folder.dataset.folder);
     };
-    $("mkdir").onclick = async () => {
-      let n = prompt("目录名称");
-      if (!n) return;
+    $("mkdir").onclick = () => {
+      $("mkdir-form").style.display = "flex";
+      $("mkdir-name").focus();
+    };
+    $("mkdir-cancel").onclick = () => {
+      $("mkdir-form").style.display = "none";
+      $("mkdir-name").value = "";
+    };
+    $("mkdir-submit").onclick = async () => {
+      let n = $("mkdir-name").value.trim();
+      if (!n) return $("mkdir-name").focus();
+      $("mkdir-submit").disabled = true;
       let r = await fetch("/api/mkdir", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -319,9 +347,17 @@
       if (!r.ok) {
         let d = await r.json().catch(() => ({}));
         alert(d.error || "创建目录失败");
+        $("mkdir-submit").disabled = false;
         return;
       }
+      $("mkdir-form").style.display = "none";
+      $("mkdir-name").value = "";
+      $("mkdir-submit").disabled = false;
       load();
+    };
+    $("mkdir-name").onkeydown = (e) => {
+      if (e.key === "Enter") $("mkdir-submit").click();
+      if (e.key === "Escape") $("mkdir-cancel").click();
     };
     $("file").onchange = (e) => upload(e.target.files);
     $("drop").ondragover = (e) => e.preventDefault();
