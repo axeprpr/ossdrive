@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/url"
 	"path"
 	"regexp"
 	"strings"
@@ -21,7 +20,7 @@ func (a *app) routes() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/skills.md", skills)
-	mux.HandleFunc("/skills", skills)
+	mux.HandleFunc("/logo.png", logo)
 	mux.HandleFunc("/health", health)
 	mux.HandleFunc("/api/list", a.list)
 	mux.HandleFunc("/api/upload-url", a.uploadURL)
@@ -174,13 +173,12 @@ func (a *app) downloadURL(w http.ResponseWriter, r *http.Request) {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid name"})
 		return
 	}
-	objectURL, err := url.Parse(a.publicBase)
-	if err != nil || objectURL.Scheme != "https" || objectURL.Host == "" {
-		jsonOut(w, http.StatusInternalServerError, map[string]string{"error": "public download is not configured"})
+	url, err := a.bucket.SignURL(key, oss.HTTPGet, 900)
+	if err != nil {
+		jsonOut(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 		return
 	}
-	objectURL.Path = strings.TrimRight(objectURL.Path, "/") + "/" + key
-	jsonOut(w, http.StatusOK, map[string]string{"url": objectURL.String()})
+	jsonOut(w, http.StatusOK, map[string]string{"url": url})
 }
 
 func (a *app) delete(w http.ResponseWriter, r *http.Request) {
