@@ -1,12 +1,12 @@
 package main
 
 import (
-	_ "embed"
+	"embed"
 	"net/http"
 )
 
-//go:embed page.html
-var page []byte
+//go:embed page.html assets/logo.png
+var pageFiles embed.FS
 
 func index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -14,5 +14,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write(page)
+	data, err := pageFiles.ReadFile("page.html")
+	if err != nil {
+		http.Error(w, "page unavailable", http.StatusInternalServerError)
+		return
+	}
+	_, _ = w.Write(data)
+}
+
+func logo(w http.ResponseWriter, r *http.Request) {
+	data, err := pageFiles.ReadFile("assets/logo.png")
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "public, max-age=86400")
+	_, _ = w.Write(data)
 }
