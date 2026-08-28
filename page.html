@@ -57,6 +57,8 @@
     #upload-status {
       position: absolute;
       right: 18px;
+      min-width: 150px;
+      text-align: right;
       color: #222;
     }
     .bar {
@@ -333,7 +335,6 @@
         let d = await r.json(),
           x = new XMLHttpRequest(),
           started = performance.now();
-        $("drop-title").textContent = "";
         $("drop").style.setProperty("--progress", "0%");
         $("upload-status").textContent = "上传中 0%";
         x.open("PUT", d.url);
