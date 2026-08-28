@@ -60,7 +60,10 @@ func (a *app) list(w http.ResponseWriter, r *http.Request) {
 	current := strings.Trim(r.URL.Query().Get("prefix"), "/")
 	prefix := a.prefix
 	if current != "" {
-		prefix += "/" + current
+		if prefix != "" {
+			prefix += "/"
+		}
+		prefix += current
 	}
 	if prefix != "" {
 		prefix += "/"
@@ -78,6 +81,14 @@ func (a *app) list(w http.ResponseWriter, r *http.Request) {
 		for _, object := range listing.Objects {
 			name := strings.TrimPrefix(a.relative(object.Key), current+"/")
 			if name == ".ossdrive-folder" {
+				continue
+			}
+			if strings.HasSuffix(name, "/.ossdrive-folder") {
+				name = strings.TrimSuffix(name, "/.ossdrive-folder")
+				if name != "" && !strings.Contains(name, "/") && !folders[name] {
+					result.Folders = append(result.Folders, name)
+					folders[name] = true
+				}
 				continue
 			}
 			if strings.HasSuffix(name, "/") {
