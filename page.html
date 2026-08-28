@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>OSS 网盘</title
+  ><style>
+    body {
+      margin: 0;
+      background: #fff;
+      color: #222;
+      font:
+        14px Arial,
+        sans-serif;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: auto;
+      padding: 20px 14px;
+    }
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 20px;
+      font-weight: 400;
+    }
+    .muted {
+      color: #7c8799;
+      font-size: 13px;
+    }
+    .drop {
+      position: relative;
+      margin: 18px 0;
+      padding: 24px;
+      text-align: center;
+      border: 1px dashed #b8bec8;
+      border-radius: 12px;
+      background: linear-gradient(
+        90deg,
+        #e7edf7 var(--progress, 0%),
+        #fafafa var(--progress, 0%)
+      );
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .drop:hover {
+      border-color: #7d8795;
+      background: linear-gradient(
+        90deg,
+        #dfe8f6 var(--progress, 0%),
+        #f7f8fa var(--progress, 0%)
+      );
+    }
+    #upload-status {
+      position: absolute;
+      right: 18px;
+      min-width: 150px;
+      text-align: right;
+      color: #222;
+    }
+    .bar {
+      display: flex;
+      justify-content: space-between;
+      margin: 18px 2px 10px;
+    }
+    .list {
+      border: 1px solid #dfe3e8;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 100px 170px 95px;
+      gap: 8px;
+      padding: 9px 10px;
+      border-bottom: 1px solid #eee;
+      align-items: center;
+    }
+    .row:last-child {
+      border: 0;
+    }
+    .folder {
+      color: #2866d8;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .folder:hover {
+      text-decoration: underline;
+    }
+    .name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    button {
+      border: 0;
+      padding: 0 5px;
+      background: transparent;
+      color: #0645ad;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    label {
+      display: block;
+      color: #0645ad;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    input {
+      display: none;
+    }
+    button.alt {
+      color: #0645ad;
+      background: transparent;
+    }
+    .ops {
+      white-space: nowrap;
+    }
+    .ops button {
+      font-size: 13px;
+      padding: 0 4px;
+    }
+    .empty {
+      text-align: center;
+      padding: 28px;
+      color: #888;
+    }
+    .mkdir-form {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+      background: rgb(0 0 0 / 18%);
+    }
+    .mkdir-box {
+      width: min(320px, calc(100vw - 40px));
+      padding: 20px;
+      border: 1px solid #dfe3e8;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 30px rgb(0 0 0 / 12%);
+    }
+    .mkdir-title {
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .mkdir-form input {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #c8ced8;
+      border-radius: 8px;
+      font: inherit;
+    }
+    .mkdir-hint {
+      margin-top: 8px;
+      color: #7c8799;
+      font-size: 12px;
+    }
+    .mkdir-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    input {
+      display: none;
+    }
+    @media (max-width: 650px) {
+      .row {
+        grid-template-columns: 1fr 70px 55px;
+      }
+      .row .date {
+        display: none;
+      }
+    }
+  </style>
+  <main class="wrap">
+    <header class="head">
+      <div><div class="brand">OSS 网盘</div></div>
+      <div></div>
+    </header>
+    <section id="drop" class="drop" onclick="$('file').click()">
+      <span id="drop-title">点击或拖拽文件上传</span
+      ><span id="upload-status"></span><input id="file" type="file" multiple />
+    </section>
+    <div class="bar">
+      <span
+        ><button type="button" id="back" hidden>返回上级</button>
+        <span id="crumb" class="muted">根目录</span></span
+      ><span
+        ><button type="button" id="mkdir">新建目录</button>
+        <span id="usage" class="muted"></span
+      ></span>
+    </div>
+    <div id="mkdir-form" class="mkdir-form">
+      <div class="mkdir-box">
+        <div class="mkdir-title">新建目录</div>
+        <input id="mkdir-name" type="text" placeholder="输入目录名称" maxlength="64" />
+        <div id="mkdir-hint" class="mkdir-hint">仅支持中文、英文、数字、- 和 _</div>
+        <div class="mkdir-actions">
+          <button type="button" id="mkdir-cancel">取消</button>
+          <button type="button" id="mkdir-submit">创建</button>
+        </div>
+      </div>
+    </div>
+    <section class="list">
+      <div class="row muted">
+        <b>名称</b><b>大小</b><b class="date">修改时间</b><b></b>
+      </div>
+      <div id="items"></div>
+    </section>
+  </main>
+  <script>
+    let cur = "";
+    const directoryPattern = /^[\u4e00-\u9fffA-Za-z0-9_-]{1,64}$/;
+    const $ = (x) => document.getElementById(x),
+      esc = (x) =>
+        x.replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+    function fmt(n) {
+      let u = ["B", "KB", "MB", "GB", "TB"],
+        i = 0;
+      while (n >= 1024 && i < 4) (n /= 1024), i++;
+      return n.toFixed(i ? 1 : 0) + " " + u[i];
+    }
+    async function load() {
+      let r = await fetch("/api/list?prefix=" + encodeURIComponent(cur));
+      let d = await r.json();
+      if (!r.ok) return alert(d.error || "读取失败");
+      $("crumb").textContent = cur ? "根目录 / " + cur : "根目录";
+      $("back").hidden = !cur;
+      $("usage").textContent = fmt(d.usage) + " / 500 GB";
+      let h = d.folders
+        .map(
+          (f) =>
+            '<div class=row><div class="name folder" data-folder="' +
+            esc(f) +
+            '">📁 ' +
+            esc(f) +
+            "</div><div></div><div class=date></div><div></div></div>",
+        )
+        .join("");
+      h += d.files
+        .map(
+          (x) =>
+            "<div class=row><div class=name>📄 " +
+            esc(x.name) +
+            "</div><div class=muted>" +
+            fmt(x.size) +
+            '</div><div class="muted date">' +
+            new Date(x.modified).toLocaleString() +
+            '</div><div class=ops><button onclick="download(' +
+            JSON.stringify(x.name) +
+            ')">下载</button><button type=button class=alt data-delete="' +
+            esc(x.name) +
+            '">删除</button></div></div>',
+        )
+        .join("");
+      $("items").innerHTML = h || "<div class=empty>暂无文件</div>";
+    }
+    function openFolder(x) {
+      cur = cur ? cur + "/" + x : x;
+      load();
+    }
+    function goBack() {
+      let parts = cur.split("/");
+      parts.pop();
+      cur = parts.join("/");
+      load();
+    }
+    async function download(n) {
+      let d = await (
+        await fetch(
+          "/api/download-url?name=" +
+            encodeURIComponent(cur ? cur + "/" + n : n),
+        )
+      ).json();
+      location.href = d.url;
+    }
+    async function removeFile(n, button) {
+      if (!window.confirm("确认删除？")) return;
+      if (button) {
+        button.disabled = true;
+        button.textContent = "删除中...";
+      }
+      try {
+        let r = await fetch("/api/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: cur ? cur + "/" + n : n }),
+        });
+        if (!r.ok) {
+          let d = await r.json().catch(() => ({}));
+          throw new Error(d.error || "删除失败");
+        }
+        await load();
+      } catch (e) {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "删";
+        }
+        alert(e.message);
+      }
+    }
+    async function upload(fs) {
+      for (const f of fs) {
+        let n = cur ? cur + "/" + f.name : f.name;
+        let r = await fetch("/api/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: n }),
+        });
+        if (!r.ok) {
+          alert("上传频率受限");
+          continue;
+        }
+        let d = await r.json(),
+          x = new XMLHttpRequest(),
+          started = performance.now();
+        $("drop").style.setProperty("--progress", "0%");
+        $("upload-status").textContent = "上传中 0%";
+        x.open("PUT", d.url);
+        x.setRequestHeader("Content-Type", "");
+        x.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            let percent = Math.round((e.loaded / e.total) * 100);
+            let elapsed = Math.max((performance.now() - started) / 1000, 0.001);
+            let speed = fmt(e.loaded / elapsed) + "/s";
+            $("drop").style.setProperty("--progress", percent + "%");
+            $("upload-status").textContent =
+              "上传中 " + percent + "% · " + speed;
+          }
+        };
+        await new Promise((z) => {
+          x.onload = z;
+          x.onerror = z;
+          x.send(f);
+        });
+        if (x.status < 200 || x.status >= 300) alert(f.name + " 上传失败");
+      }
+      $("drop").style.setProperty("--progress", "0%");
+      $("drop-title").textContent = "点击或拖拽文件上传";
+      $("upload-status").textContent = "";
+      load();
+    }
+    $("back").onclick = goBack;
+    $("items").onclick = (e) => {
+      let button = e.target.closest("[data-delete]");
+      if (button) {
+        removeFile(button.dataset.delete, button);
+        return;
+      }
+      let folder = e.target.closest("[data-folder]");
+      if (folder) openFolder(folder.dataset.folder);
+    };
+    $("mkdir").onclick = () => {
+      $("mkdir-form").style.display = "flex";
+      $("mkdir-name").focus();
+    };
+    $("mkdir-cancel").onclick = () => {
+      $("mkdir-form").style.display = "none";
+      $("mkdir-name").value = "";
+      $("mkdir-hint").textContent = "仅支持中文、英文、数字、- 和 _";
+    };
+    $("mkdir-submit").onclick = async () => {
+      let n = $("mkdir-name").value.trim();
+      if (!n) return $("mkdir-name").focus();
+      if (!directoryPattern.test(n)) {
+        $("mkdir-hint").textContent = "目录名只能使用中文、英文、数字、- 和 _（1-64 个字符）";
+        $("mkdir-name").focus();
+        return;
+      }
+      $("mkdir-submit").disabled = true;
+      try {
+        let r = await fetch("/api/mkdir", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: cur ? cur + "/" + n : n }),
+        });
+        if (!r.ok) {
+          let d = await r.json().catch(() => ({}));
+          throw new Error(d.error || "创建目录失败");
+        }
+      } catch (e) {
+        alert(e.message);
+        $("mkdir-submit").disabled = false;
+        return;
+      }
+      $("mkdir-form").style.display = "none";
+      $("mkdir-name").value = "";
+      $("mkdir-hint").textContent = "仅支持中文、英文、数字、- 和 _";
+      $("mkdir-submit").disabled = false;
+      load();
+    };
+    $("mkdir-name").onkeydown = (e) => {
+      if (e.key === "Enter") $("mkdir-submit").click();
+      if (e.key === "Escape") $("mkdir-cancel").click();
+    };
+    $("file").onchange = (e) => upload(e.target.files);
+    $("drop").ondragover = (e) => e.preventDefault();
+    $("drop").ondrop = (e) => {
+      e.preventDefault();
+      upload(e.dataTransfer.files);
+    };
+    load();
+    setInterval(load, 10000);
+  </script>
+</html>
