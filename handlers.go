@@ -7,11 +7,14 @@ import (
 	"net"
 	"net/http"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
+
+var directoryNamePattern = regexp.MustCompile(`^[\p{Han}A-Za-z0-9_-]{1,64}$`)
 
 func (a *app) routes() *http.ServeMux {
 	mux := http.NewServeMux()
@@ -206,6 +209,11 @@ func (a *app) mkdir(w http.ResponseWriter, r *http.Request) {
 	key, err := a.key(request.Name)
 	if err != nil {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid name"})
+		return
+	}
+	directoryName := path.Base(strings.TrimSuffix(request.Name, "/"))
+	if !directoryNamePattern.MatchString(directoryName) {
+		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "目录名只能包含中文、英文、数字、短横线和下划线，长度 1-64 个字符"})
 		return
 	}
 	if err = a.bucket.PutObject(key+"/.ossdrive-folder", strings.NewReader("")); err != nil {

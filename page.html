@@ -125,17 +125,44 @@
     }
     .mkdir-form {
       display: none;
-      margin: 12px 0;
-      gap: 8px;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
       align-items: center;
+      justify-content: center;
+      background: rgb(0 0 0 / 18%);
+    }
+    .mkdir-box {
+      width: min(320px, calc(100vw - 40px));
+      padding: 20px;
+      border: 1px solid #dfe3e8;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 30px rgb(0 0 0 / 12%);
+    }
+    .mkdir-title {
+      margin-bottom: 12px;
+      font-size: 16px;
     }
     .mkdir-form input {
       display: block;
-      width: 220px;
-      padding: 6px 8px;
+      box-sizing: border-box;
+      width: 100%;
+      padding: 9px 10px;
       border: 1px solid #c8ced8;
-      border-radius: 7px;
+      border-radius: 8px;
       font: inherit;
+    }
+    .mkdir-hint {
+      margin-top: 8px;
+      color: #7c8799;
+      font-size: 12px;
+    }
+    .mkdir-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 16px;
     }
     input {
       display: none;
@@ -168,9 +195,15 @@
       ></span>
     </div>
     <div id="mkdir-form" class="mkdir-form">
-      <input id="mkdir-name" type="text" placeholder="目录名称" />
-      <button type="button" id="mkdir-submit">创建</button>
-      <button type="button" id="mkdir-cancel">取消</button>
+      <div class="mkdir-box">
+        <div class="mkdir-title">新建目录</div>
+        <input id="mkdir-name" type="text" placeholder="输入目录名称" maxlength="64" />
+        <div id="mkdir-hint" class="mkdir-hint">仅支持中文、英文、数字、- 和 _</div>
+        <div class="mkdir-actions">
+          <button type="button" id="mkdir-cancel">取消</button>
+          <button type="button" id="mkdir-submit">创建</button>
+        </div>
+      </div>
     </div>
     <section class="list">
       <div class="row muted">
@@ -181,6 +214,7 @@
   </main>
   <script>
     let cur = "";
+    const directoryPattern = /^[\u4e00-\u9fffA-Za-z0-9_-]{1,64}$/;
     const $ = (x) => document.getElementById(x),
       esc = (x) =>
         x.replace(
@@ -334,24 +368,35 @@
     $("mkdir-cancel").onclick = () => {
       $("mkdir-form").style.display = "none";
       $("mkdir-name").value = "";
+      $("mkdir-hint").textContent = "仅支持中文、英文、数字、- 和 _";
     };
     $("mkdir-submit").onclick = async () => {
       let n = $("mkdir-name").value.trim();
       if (!n) return $("mkdir-name").focus();
+      if (!directoryPattern.test(n)) {
+        $("mkdir-hint").textContent = "目录名只能使用中文、英文、数字、- 和 _（1-64 个字符）";
+        $("mkdir-name").focus();
+        return;
+      }
       $("mkdir-submit").disabled = true;
-      let r = await fetch("/api/mkdir", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: cur ? cur + "/" + n : n }),
-      });
-      if (!r.ok) {
-        let d = await r.json().catch(() => ({}));
-        alert(d.error || "创建目录失败");
+      try {
+        let r = await fetch("/api/mkdir", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: cur ? cur + "/" + n : n }),
+        });
+        if (!r.ok) {
+          let d = await r.json().catch(() => ({}));
+          throw new Error(d.error || "创建目录失败");
+        }
+      } catch (e) {
+        alert(e.message);
         $("mkdir-submit").disabled = false;
         return;
       }
       $("mkdir-form").style.display = "none";
       $("mkdir-name").value = "";
+      $("mkdir-hint").textContent = "仅支持中文、英文、数字、- 和 _";
       $("mkdir-submit").disabled = false;
       load();
     };
