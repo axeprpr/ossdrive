@@ -74,6 +74,9 @@ func (a *app) list(w http.ResponseWriter, r *http.Request) {
 		}
 		for _, object := range listing.Objects {
 			name := strings.TrimPrefix(a.relative(object.Key), current+"/")
+			if name == ".ossdrive-folder" {
+				continue
+			}
 			if strings.HasSuffix(name, "/") {
 				name = strings.TrimSuffix(name, "/")
 				if name != "" && !strings.Contains(name, "/") && !folders[name] {
@@ -205,7 +208,7 @@ func (a *app) mkdir(w http.ResponseWriter, r *http.Request) {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid name"})
 		return
 	}
-	if err = a.bucket.PutObject(key+"/", strings.NewReader("")); err != nil {
+	if err = a.bucket.PutObject(key+"/.ossdrive-folder", strings.NewReader("")); err != nil {
 		log.Printf("mkdir %q: %v", key, err)
 		jsonOut(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 		return
