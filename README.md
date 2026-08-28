@@ -48,6 +48,23 @@ docker run -d --name ossdrive -p 5000:3000 \
   ossdrive
 ```
 
+## 构建二进制
+
+GitHub Actions 支持手动运行，也会在推送 `v*` 标签时自动构建：
+
+- Linux：`amd64`、`arm64`
+- macOS：`amd64`、`arm64`
+- Windows：`amd64`、`arm64`
+
+手动运行时可在 GitHub Actions 页面下载 Artifacts。发布版本时执行：
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+随后构建产物会自动作为 GitHub Release 附件发布。
+
 应用服务器需要具备 OSS 的列举、读取签名、写入签名和删除权限。公开部署前，建议使用专用 RAM 用户和单独 Bucket，并按需收紧删除权限。
 
 ## 注意
