@@ -80,6 +80,9 @@
       cursor: pointer;
       font-weight: 600;
     }
+    .folder:hover {
+      text-decoration: underline;
+    }
     .name {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -188,9 +191,9 @@
       let h = d.folders
         .map(
           (f) =>
-            '<div class=row><div class="name folder" onclick="openFolder(' +
-            JSON.stringify(f) +
-            ')">📁 ' +
+            '<div class=row><div class="name folder" data-folder="' +
+            esc(f) +
+            '">📁 ' +
             esc(f) +
             "</div><div></div><div class=date></div><div></div></div>",
         )
@@ -298,7 +301,12 @@
     $("back").onclick = goBack;
     $("items").onclick = (e) => {
       let button = e.target.closest("[data-delete]");
-      if (button) removeFile(button.dataset.delete, button);
+      if (button) {
+        removeFile(button.dataset.delete, button);
+        return;
+      }
+      let folder = e.target.closest("[data-folder]");
+      if (folder) openFolder(folder.dataset.folder);
     };
     $("mkdir").onclick = async () => {
       let n = prompt("目录名称");
