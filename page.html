@@ -273,12 +273,19 @@
         font-size: 12px;
       }
       .bar {
-        gap: 8px;
-        align-items: flex-start;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .bar-left {
+        width: 100%;
       }
       .bar-right {
+        width: 100%;
         flex-wrap: wrap;
-        gap: 6px 10px;
+        justify-content: space-between;
+        gap: 8px 10px;
       }
       .bar-right #usage {
         text-align: right;
@@ -286,6 +293,7 @@
       .row {
         grid-template-columns: minmax(0, 1fr) auto;
         padding: 10px 9px;
+        min-width: 0;
       }
       .row > :nth-child(2),
       .row .date {
@@ -293,7 +301,12 @@
       }
       .ops {
         justify-self: end;
+        max-width: 100%;
+        flex-wrap: wrap;
         gap: 4px;
+      }
+      button.action {
+        padding: 0 7px;
       }
       .mkdir-box {
         width: calc(100vw - 48px);
