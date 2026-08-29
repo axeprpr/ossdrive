@@ -3,7 +3,8 @@
   <meta charset="utf-8" /><meta
     name="viewport"
     content="width=device-width,initial-scale=1"
-  /><title>OSS 网盘</title><link rel="icon" href="/logo.png" />
+  /><title>OSS 网盘</title
+  ><link rel="icon" href="/logo.png" />
   ><style>
     body {
       margin: 0;
@@ -128,6 +129,16 @@
     button.action:hover {
       border-color: #aeb8ca;
       background: #f6f8fc;
+    }
+    button.action svg {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     button.action.danger {
       color: #b04452;
@@ -265,7 +276,11 @@
         <span id="crumb" class="muted">根目录</span></span
       ><span
         ><button type="button" class="action" id="mkdir">
-          <span aria-hidden="true">＋</span>新建目录
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 7.5h7l2 2h9v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <path d="M12 12v5M9.5 14.5h5" />
+          </svg>
+          新建目录
         </button>
         <span id="usage" class="muted"></span
       ></span>
@@ -298,6 +313,10 @@
   <script>
     let cur = "";
     const directoryPattern = /^[\u4e00-\u9fffA-Za-z0-9_-]{1,64}$/;
+    const downloadIcon =
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 21h14" /></svg>';
+    const deleteIcon =
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5" /></svg>';
     const $ = (x) => document.getElementById(x),
       esc = (x) =>
         x.replace(
@@ -345,9 +364,13 @@
             new Date(x.modified).toLocaleString() +
             '</div><div class=ops><button class=action onclick="download(' +
             JSON.stringify(x.name) +
-            ')"><span aria-hidden="true">⇩</span>下载</button><button type=button class="action danger" data-delete="' +
+            ')"><span class="icon">' +
+            downloadIcon +
+            '</span>下载</button><button type=button class="action danger" data-delete="' +
             esc(x.name) +
-            '"><span aria-hidden="true">⌫</span>删除</button></div></div>',
+            '"><span class="icon">' +
+            deleteIcon +
+            "</span>删除</button></div></div>",
         )
         .join("");
       $("items").innerHTML = h || "<div class=empty>暂无文件</div>";
@@ -391,7 +414,7 @@
       } catch (e) {
         if (button) {
           button.disabled = false;
-          button.innerHTML = '<span aria-hidden="true">⌫</span>删除';
+          button.innerHTML = '<span class="icon">' + deleteIcon + "</span>删除";
         }
         alert(e.message);
       }
