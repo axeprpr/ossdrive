@@ -1,7 +1,6 @@
 package main
 
 import (
-	"strings"
 	"sync"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 
 type app struct {
 	bucket  *oss.Bucket
-	publicBase string
 	prefix  string
 	mu      sync.Mutex
 	uploads map[string][]time.Time
@@ -28,6 +26,6 @@ type listResponse struct {
 	Usage   int64      `json:"usage"`
 }
 
-func newApp(bucket *oss.Bucket, prefix, publicBase string) *app {
-	return &app{bucket: bucket, publicBase: strings.TrimRight(publicBase, "/"), prefix: prefix, uploads: make(map[string][]time.Time)}
+func newApp(bucket *oss.Bucket, prefix string) *app {
+	return &app{bucket: bucket, prefix: prefix, uploads: make(map[string][]time.Time)}
 }
