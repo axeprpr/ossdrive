@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-//go:embed page.html assets/logo.png
+//go:embed page.html assets/logo.svg
 var pageFiles embed.FS
 
 func index(w http.ResponseWriter, r *http.Request) {
