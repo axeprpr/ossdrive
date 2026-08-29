@@ -14,6 +14,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 	data, err := pageFiles.ReadFile("page.html")
 	if err != nil {
 		http.Error(w, "page unavailable", http.StatusInternalServerError)
