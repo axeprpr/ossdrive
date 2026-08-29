@@ -21,8 +21,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	publicBase := "https://" + os.Getenv("OSS_BUCKET") + "." + strings.TrimPrefix(strings.TrimPrefix(endpoint, "https://"), "http://")
-	server := newApp(bucket, strings.Trim(os.Getenv("OSS_PREFIX"), "/"), publicBase)
+	server := newApp(bucket, strings.Trim(os.Getenv("OSS_PREFIX"), "/"))
 	log.Fatal(http.ListenAndServe(":"+getenv("PORT", "3000"), server.routes()))
 }
 

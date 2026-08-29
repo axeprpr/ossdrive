@@ -3,7 +3,8 @@
   <meta charset="utf-8" /><meta
     name="viewport"
     content="width=device-width,initial-scale=1"
-  /><title>OSS 网盘</title><link rel="icon" href="/logo.png" />
+  /><title>OSS 网盘</title
+  ><link rel="icon" href="/logo.svg?v=2" />
   ><style>
     body {
       margin: 0;
@@ -72,8 +73,35 @@
     }
     .bar {
       display: flex;
+      align-items: center;
       justify-content: space-between;
+      gap: 14px;
       margin: 18px 2px 10px;
+    }
+    .bar-left,
+    .bar-right {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+    .bar-left {
+      overflow: hidden;
+      gap: 8px;
+    }
+    .bar-left > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .bar-right {
+      flex: 0 0 auto;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    #usage {
+      white-space: nowrap;
+      font-size: 12px;
+      color: #a0a8b5;
     }
     .list {
       border: 1px solid #dfe3e8;
@@ -82,7 +110,7 @@
     }
     .row {
       display: grid;
-      grid-template-columns: 1fr 100px 170px 95px;
+      grid-template-columns: 1fr 100px 170px 135px;
       gap: 8px;
       padding: 9px 10px;
       border-bottom: 1px solid #eee;
@@ -117,7 +145,8 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 5px 9px;
+      min-height: 30px;
+      padding: 0 9px;
       border: 1px solid #d7dce5;
       border-radius: 7px;
       background: #fff;
@@ -125,9 +154,27 @@
       text-decoration: none;
       line-height: 1;
     }
+    button.action .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      line-height: 0;
+    }
     button.action:hover {
       border-color: #aeb8ca;
       background: #f6f8fc;
+    }
+    button.action svg {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     button.action.danger {
       color: #b04452;
@@ -148,6 +195,10 @@
     }
     .ops {
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
     }
     .ops button {
       font-size: 13px;
@@ -165,10 +216,15 @@
       z-index: 10;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
+      padding: 20px;
       background: rgb(0 0 0 / 18%);
     }
     .mkdir-box {
-      width: min(320px, calc(100vw - 40px));
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 320px;
+      min-width: 0;
       padding: 20px;
       border: 1px solid #dfe3e8;
       border-radius: 14px;
@@ -199,6 +255,24 @@
       gap: 12px;
       margin-top: 16px;
     }
+    .mkdir-actions button {
+      min-height: 30px;
+      padding: 0 11px;
+      border: 1px solid #d7dce5;
+      border-radius: 7px;
+      color: #315da8;
+      background: #fff;
+      text-decoration: none;
+      line-height: 1;
+    }
+    .mkdir-actions button:hover {
+      border-color: #aeb8ca;
+      background: #f6f8fc;
+    }
+    .mkdir-actions #mkdir-submit {
+      border-color: #b8cceb;
+      background: #eef4ff;
+    }
     input {
       display: none;
     }
@@ -222,15 +296,27 @@
         font-size: 12px;
       }
       .bar {
-        gap: 8px;
-        align-items: flex-start;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-top: 16px;
       }
-      .bar > span:last-child {
+      .bar-left {
+        width: 100%;
+      }
+      .bar-right {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px 10px;
+      }
+      .bar-right #usage {
         text-align: right;
       }
       .row {
         grid-template-columns: minmax(0, 1fr) auto;
         padding: 10px 9px;
+        min-width: 0;
       }
       .row > :nth-child(2),
       .row .date {
@@ -238,9 +324,16 @@
       }
       .ops {
         justify-self: end;
+        max-width: 100%;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      button.action {
+        padding: 0 7px;
       }
       .mkdir-box {
-        width: calc(100vw - 48px);
+        width: 100%;
+        max-width: 320px;
         padding: 18px;
       }
     }
@@ -249,7 +342,7 @@
     <header class="head">
       <div>
         <div class="brand">
-          <img class="logo" src="/logo.png" alt="" />
+          <img class="logo" src="/logo.svg?v=2" alt="" />
           OSS 网盘
         </div>
       </div>
@@ -260,15 +353,20 @@
       ><span id="upload-status"></span><input id="file" type="file" multiple />
     </section>
     <div class="bar">
-      <span
-        ><button type="button" id="back" hidden>返回上级</button>
-        <span id="crumb" class="muted">根目录</span></span
-      ><span
-        ><button type="button" class="action" id="mkdir">
-          <span aria-hidden="true">＋</span>新建目录
+      <div class="bar-left">
+        <button type="button" id="back" hidden>返回上级</button>
+        <span id="crumb" class="muted">根目录</span>
+      </div>
+      <div class="bar-right">
+        <span id="usage" class="muted"></span>
+        <button type="button" class="action" id="mkdir">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 7.5h7l2 2h9v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <path d="M12 12v5M9.5 14.5h5" />
+          </svg>
+          新建目录
         </button>
-        <span id="usage" class="muted"></span
-      ></span>
+      </div>
     </div>
     <div id="mkdir-form" class="mkdir-form">
       <div class="mkdir-box">
@@ -295,209 +393,5 @@
       <div id="items"></div>
     </section>
   </main>
-  <script>
-    let cur = "";
-    const directoryPattern = /^[\u4e00-\u9fffA-Za-z0-9_-]{1,64}$/;
-    const $ = (x) => document.getElementById(x),
-      esc = (x) =>
-        x.replace(
-          /[&<>"']/g,
-          (c) =>
-            ({
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#39;",
-            })[c],
-        );
-    function fmt(n) {
-      let u = ["B", "KB", "MB", "GB", "TB"],
-        i = 0;
-      while (n >= 1024 && i < 4) (n /= 1024), i++;
-      return n.toFixed(i ? 1 : 0) + " " + u[i];
-    }
-    async function load() {
-      let r = await fetch("/api/list?prefix=" + encodeURIComponent(cur));
-      let d = await r.json();
-      if (!r.ok) return alert(d.error || "读取失败");
-      $("crumb").textContent = cur ? "根目录 / " + cur : "根目录";
-      $("back").hidden = !cur;
-      $("usage").textContent = fmt(d.usage) + " / 500 GB";
-      let h = d.folders
-        .map(
-          (f) =>
-            '<div class=row><div class="name folder" data-folder="' +
-            esc(f) +
-            '">📁 ' +
-            esc(f) +
-            "</div><div></div><div class=date></div><div></div></div>",
-        )
-        .join("");
-      h += d.files
-        .map(
-          (x) =>
-            "<div class=row><div class=name>📄 " +
-            esc(x.name) +
-            "</div><div class=muted>" +
-            fmt(x.size) +
-            '</div><div class="muted date">' +
-            new Date(x.modified).toLocaleString() +
-            '</div><div class=ops><button class=action onclick="download(' +
-            JSON.stringify(x.name) +
-            ')"><span aria-hidden="true">⇩</span>下载</button><button type=button class="action danger" data-delete="' +
-            esc(x.name) +
-            '"><span aria-hidden="true">⌫</span>删除</button></div></div>',
-        )
-        .join("");
-      $("items").innerHTML = h || "<div class=empty>暂无文件</div>";
-    }
-    function openFolder(x) {
-      cur = cur ? cur + "/" + x : x;
-      load();
-    }
-    function goBack() {
-      let parts = cur.split("/");
-      parts.pop();
-      cur = parts.join("/");
-      load();
-    }
-    async function download(n) {
-      let d = await (
-        await fetch(
-          "/api/download-url?name=" +
-            encodeURIComponent(cur ? cur + "/" + n : n),
-        )
-      ).json();
-      location.href = d.url;
-    }
-    async function removeFile(n, button) {
-      if (!window.confirm("确认删除？")) return;
-      if (button) {
-        button.disabled = true;
-        button.textContent = "删除中...";
-      }
-      try {
-        let r = await fetch("/api/delete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: cur ? cur + "/" + n : n }),
-        });
-        if (!r.ok) {
-          let d = await r.json().catch(() => ({}));
-          throw new Error(d.error || "删除失败");
-        }
-        await load();
-      } catch (e) {
-        if (button) {
-          button.disabled = false;
-          button.innerHTML = '<span aria-hidden="true">⌫</span>删除';
-        }
-        alert(e.message);
-      }
-    }
-    async function upload(fs) {
-      for (const f of fs) {
-        let n = cur ? cur + "/" + f.name : f.name;
-        let r = await fetch("/api/upload-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: n }),
-        });
-        if (!r.ok) {
-          alert("上传频率受限");
-          continue;
-        }
-        let d = await r.json(),
-          x = new XMLHttpRequest(),
-          started = performance.now();
-        $("drop").style.setProperty("--progress", "0%");
-        $("upload-status").textContent = "上传中 0%";
-        x.open("PUT", d.url);
-        x.setRequestHeader("Content-Type", "");
-        x.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            let percent = Math.round((e.loaded / e.total) * 100);
-            let elapsed = Math.max((performance.now() - started) / 1000, 0.001);
-            let speed = fmt(e.loaded / elapsed) + "/s";
-            $("drop").style.setProperty("--progress", percent + "%");
-            $("upload-status").textContent =
-              "上传中 " + percent + "% · " + speed;
-          }
-        };
-        await new Promise((z) => {
-          x.onload = z;
-          x.onerror = z;
-          x.send(f);
-        });
-        if (x.status < 200 || x.status >= 300) alert(f.name + " 上传失败");
-      }
-      $("drop").style.setProperty("--progress", "0%");
-      $("drop-title").textContent = "点击或拖拽文件上传";
-      $("upload-status").textContent = "";
-      load();
-    }
-    $("back").onclick = goBack;
-    $("items").onclick = (e) => {
-      let button = e.target.closest("[data-delete]");
-      if (button) {
-        removeFile(button.dataset.delete, button);
-        return;
-      }
-      let folder = e.target.closest("[data-folder]");
-      if (folder) openFolder(folder.dataset.folder);
-    };
-    $("mkdir").onclick = () => {
-      $("mkdir-form").style.display = "flex";
-      $("mkdir-name").focus();
-    };
-    $("mkdir-cancel").onclick = () => {
-      $("mkdir-form").style.display = "none";
-      $("mkdir-name").value = "";
-      $("mkdir-hint").textContent = "仅支持中文、英文、数字、- 和 _";
-    };
-    $("mkdir-submit").onclick = async () => {
-      let n = $("mkdir-name").value.trim();
-      if (!n) return $("mkdir-name").focus();
-      if (!directoryPattern.test(n)) {
-        $("mkdir-hint").textContent =
-          "目录名只能使用中文、英文、数字、- 和 _（1-64 个字符）";
-        $("mkdir-name").focus();
-        return;
-      }
-      $("mkdir-submit").disabled = true;
-      try {
-        let r = await fetch("/api/mkdir", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: cur ? cur + "/" + n : n }),
-        });
-        if (!r.ok) {
-          let d = await r.json().catch(() => ({}));
-          throw new Error(d.error || "创建目录失败");
-        }
-      } catch (e) {
-        alert(e.message);
-        $("mkdir-submit").disabled = false;
-        return;
-      }
-      $("mkdir-form").style.display = "none";
-      $("mkdir-name").value = "";
-      $("mkdir-hint").textContent = "仅支持中文、英文、数字、- 和 _";
-      $("mkdir-submit").disabled = false;
-      load();
-    };
-    $("mkdir-name").onkeydown = (e) => {
-      if (e.key === "Enter") $("mkdir-submit").click();
-      if (e.key === "Escape") $("mkdir-cancel").click();
-    };
-    $("file").onchange = (e) => upload(e.target.files);
-    $("drop").ondragover = (e) => e.preventDefault();
-    $("drop").ondrop = (e) => {
-      e.preventDefault();
-      upload(e.dataTransfer.files);
-    };
-    load();
-    setInterval(load, 10000);
-  </script>
+  <script src="/app.js?v=2" defer></script>
 </html>
