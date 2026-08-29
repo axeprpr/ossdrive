@@ -216,10 +216,15 @@
       z-index: 10;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
+      padding: 20px;
       background: rgb(0 0 0 / 18%);
     }
     .mkdir-box {
-      width: min(320px, calc(100vw - 40px));
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 320px;
+      min-width: 0;
       padding: 20px;
       border: 1px solid #dfe3e8;
       border-radius: 14px;
@@ -327,7 +332,8 @@
         padding: 0 7px;
       }
       .mkdir-box {
-        width: calc(100vw - 48px);
+        width: 100%;
+        max-width: 320px;
         padding: 18px;
       }
     }
