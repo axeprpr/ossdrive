@@ -25,6 +25,7 @@ func (a *app) routes() *http.ServeMux {
 	mux.HandleFunc("/api/list", a.list)
 	mux.HandleFunc("/api/upload-url", a.uploadURL)
 	mux.HandleFunc("/api/download-url", a.downloadURL)
+	mux.HandleFunc("/api/download", a.download)
 	mux.HandleFunc("/api/delete", a.delete)
 	mux.HandleFunc("/api/mkdir", a.mkdir)
 	return mux
@@ -179,6 +180,20 @@ func (a *app) downloadURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	jsonOut(w, http.StatusOK, map[string]string{"url": url})
+}
+
+func (a *app) download(w http.ResponseWriter, r *http.Request) {
+	key, err := a.key(r.URL.Query().Get("name"))
+	if err != nil {
+		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid name"})
+		return
+	}
+	url, err := a.bucket.SignURL(key, oss.HTTPGet, 900)
+	if err != nil {
+		jsonOut(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
 func (a *app) delete(w http.ResponseWriter, r *http.Request) {

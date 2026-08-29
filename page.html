@@ -468,14 +468,9 @@
       cur = parts.join("/");
       load();
     }
-    async function download(n) {
-      let d = await (
-        await fetch(
-          "/api/download-url?name=" +
-            encodeURIComponent(cur ? cur + "/" + n : n),
-        )
-      ).json();
-      location.href = d.url;
+    function download(n) {
+      location.href =
+        "/api/download?name=" + encodeURIComponent(cur ? cur + "/" + n : n);
     }
     async function removeFile(n, button) {
       if (!window.confirm("确认删除？")) return;
