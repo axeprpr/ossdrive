@@ -23,12 +23,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func logo(w http.ResponseWriter, r *http.Request) {
-	data, err := pageFiles.ReadFile("assets/logo.png")
+	data, err := pageFiles.ReadFile("assets/logo.svg")
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Content-Type", "image/svg+xml")
 	w.Header().Set("Cache-Control", "public, max-age=86400")
 	_, _ = w.Write(data)
 }

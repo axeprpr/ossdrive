@@ -20,7 +20,7 @@ func (a *app) routes() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/skills.md", skills)
-	mux.HandleFunc("/logo.png", logo)
+	mux.HandleFunc("/logo.svg", logo)
 	mux.HandleFunc("/health", health)
 	mux.HandleFunc("/api/list", a.list)
 	mux.HandleFunc("/api/upload-url", a.uploadURL)
