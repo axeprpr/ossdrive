@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"net/http"
+	"strconv"
 )
 
 //go:embed page.html app.js assets/logo.svg
@@ -42,5 +43,6 @@ func script(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
 	_, _ = w.Write(data)
 }
