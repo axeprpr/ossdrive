@@ -33,9 +33,9 @@
       let h = d.folders
         .map(
           (f) =>
-            '<div class=row><div class="name folder" data-folder="' +
+            '<div class="row" data-folder="' +
             esc(f) +
-            '">📁 ' +
+            '"><div class="name folder">📁 ' +
             esc(f) +
             "</div><div></div><div class=date></div><div></div></div>",
         )
@@ -43,15 +43,17 @@
       h += d.files
         .map(
           (x) =>
-            "<div class=row><div class=name>📄 " +
+            '<div class="row" data-download="' +
+            esc(x.name) +
+            '"><div class="name">📄 ' +
             esc(x.name) +
             "</div><div class=muted>" +
             fmt(x.size) +
             '</div><div class="muted date">' +
             new Date(x.modified).toLocaleString() +
-            '</div><div class=ops><button class=action onclick="download(' +
-            JSON.stringify(x.name) +
-            ')"><span class="icon">' +
+            '</div><div class=ops><button type=button class=action data-download="' +
+            esc(x.name) +
+            '"><span class="icon">' +
             downloadIcon +
             '</span>下载</button><button type=button class="action danger" data-delete="' +
             esc(x.name) +
@@ -150,7 +152,12 @@
         return;
       }
       let folder = e.target.closest("[data-folder]");
-      if (folder) openFolder(folder.dataset.folder);
+      if (folder) {
+        openFolder(folder.dataset.folder);
+        return;
+      }
+      let file = e.target.closest("[data-download]");
+      if (file) download(file.dataset.download);
     };
     $("mkdir").onclick = () => {
       $("mkdir-form").style.display = "flex";

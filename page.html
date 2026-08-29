@@ -115,6 +115,14 @@
       padding: 9px 10px;
       border-bottom: 1px solid #eee;
       align-items: center;
+      transition: background-color 0.15s ease;
+    }
+    .row[data-folder],
+    .row[data-download] {
+      cursor: pointer;
+    }
+    .row:not(.muted):hover {
+      background: #f5f8fc;
     }
     .row:last-child {
       border: 0;
