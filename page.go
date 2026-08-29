@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-//go:embed page.html assets/logo.svg
+//go:embed page.html app.js assets/logo.svg
 var pageFiles embed.FS
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -31,5 +31,16 @@ func logo(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "image/svg+xml")
 	w.Header().Set("Cache-Control", "public, max-age=300")
+	_, _ = w.Write(data)
+}
+
+func script(w http.ResponseWriter, r *http.Request) {
+	data, err := pageFiles.ReadFile("app.js")
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 	_, _ = w.Write(data)
 }
