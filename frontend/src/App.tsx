@@ -204,7 +204,7 @@ export default function App() {
 
         <FileTable items={listing.items} selected={selected} deleting={deleting} sort={sort} direction={direction} onSort={sortBy} onOpenFolder={(name) => { setPath(fullName(name)); setPage(1); }} onToggle={(name, checked) => { const next = new Set(selected); checked ? next.add(name) : next.delete(name); setSelected(next); }} onPreview={(name) => void openPreview(name)} onDownload={(name) => { location.href = downloadUrl(name); }} onDelete={(name, kind = "file") => kind === "folder" ? setDeleteTarget({ name, kind }) : void remove(name)} />
 
-        <footer className="flex shrink-0 items-center justify-between gap-2 pt-3 sm:gap-3">
+        <footer className="flex shrink-0 items-center justify-between gap-2 py-3 sm:gap-3">
           <span className="min-w-0 max-w-[35%] truncate pl-[30px] text-xs text-[#829488]" title={path || "/"}>{path || "/"}</span>
           <div className="flex items-center justify-center gap-2 pr-[30px] sm:gap-3">
           <Select value={String(pageSize)} onValueChange={(value) => { setPageSize(Number(value)); setPage(1); }}>
