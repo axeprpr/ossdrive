@@ -9,8 +9,10 @@
   ><style>
     body {
       margin: 0;
-      background: #fff;
-      color: #222;
+      height: 100vh;
+      overflow: hidden;
+      background: #fbfdf8;
+      color: #26332b;
       font:
         14px -apple-system,
         BlinkMacSystemFont,
@@ -18,9 +20,14 @@
         sans-serif;
     }
     .wrap {
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      height: 100vh;
       max-width: 760px;
       margin: auto;
-      padding: 20px 14px;
+      padding: 16px 14px 12px;
+      overflow: hidden;
     }
     .head {
       display: flex;
@@ -52,8 +59,9 @@
     }
     .drop {
       position: relative;
-      margin: 18px 0;
-      padding: 24px;
+      flex: 0 0 auto;
+      margin: 14px 0;
+      padding: 18px;
       text-align: center;
       border: 1px dashed #b8bec8;
       border-radius: 12px;
@@ -66,7 +74,7 @@
       transition: background 0.15s ease;
     }
     .drop:hover {
-      border-color: #7d8795;
+      border-color: #8fac94;
       background: linear-gradient(
         90deg,
         #dfe8f6 var(--progress, 0%),
@@ -85,7 +93,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin: 18px 2px 10px;
+      margin: 4px 2px 8px;
     }
     .bar-left,
     .bar-right {
@@ -97,6 +105,16 @@
       overflow: hidden;
       gap: 8px;
     }
+    #crumb { cursor: pointer; }
+    #crumb {
+      overflow: hidden;
+      padding: 3px 5px;
+      color: #5d8067;
+      text-overflow: ellipsis;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    #crumb:hover { color: #376044; }
     .bar-left > span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -105,24 +123,29 @@
     .bar-right {
       flex: 0 0 auto;
       justify-content: flex-end;
-      gap: 12px;
+      gap: 6px;
     }
     #usage {
       white-space: nowrap;
       font-size: 12px;
-      color: #a0a8b5;
+      color: #829488;
     }
     .list {
-      border: 1px solid #dfe3e8;
-      border-radius: 12px;
-      overflow: hidden;
+      flex: 1 1 auto;
+      min-height: 170px;
+      border: 1px solid #dce7dc;
+      border-radius: 10px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
+      background: #fff;
     }
     .row {
       display: grid;
-      grid-template-columns: 28px minmax(0, 1fr) 100px 170px 210px;
+      grid-template-columns: 26px minmax(0, 1fr) 88px 145px 196px;
       gap: 8px;
-      padding: 9px 10px;
-      border-bottom: 1px solid #eee;
+      padding: 7px 9px;
+      border-bottom: 1px solid #edf2ec;
       align-items: center;
       transition: background-color 0.15s ease;
     }
@@ -131,23 +154,47 @@
       cursor: pointer;
     }
     .row:not(.muted):hover {
-      background: #f5f8fc;
+      background: #f3f8f1;
     }
     .row:last-child {
       border: 0;
     }
     .folder {
-      color: #2866d8;
+      color: #4f7c5b;
       cursor: pointer;
       font-weight: 600;
     }
     .folder:hover {
-      color: #1d4fae;
+      color: #315f3d;
     }
     .name {
+      position: relative;
+      min-width: 0;
+    }
+    .name-text {
+      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    .name[data-tooltip]:hover::after {
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 0;
+      z-index: 8;
+      max-width: min(420px, 70vw);
+      padding: 6px 9px;
+      border: 1px solid #d8e5d8;
+      border-radius: 8px;
+      background: #fffffc;
+      box-shadow: 0 5px 18px rgb(61 85 65 / 14%);
+      color: #34463a;
+      content: attr(data-tooltip);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.45;
+      white-space: normal;
+      word-break: break-all;
     }
     button {
       border: 0;
@@ -165,11 +212,11 @@
       align-items: center;
       gap: 3px;
       min-height: 30px;
-      padding: 0 11px;
-      border: 1px solid #d7dce5;
-      border-radius: 7px;
-      background: #fff;
-      color: #315da8;
+      padding: 0 10px;
+      border: 1px solid #cfdfd0;
+      border-radius: 8px;
+      background: #fffffc;
+      color: #4d7657;
       text-decoration: none;
       line-height: 1;
     }
@@ -182,8 +229,8 @@
       line-height: 0;
     }
     button.action:hover {
-      border-color: #aeb8ca;
-      background: #f6f8fc;
+      border-color: #9fbea4;
+      background: #f2f8f1;
     }
     button.action svg {
       width: 14px;
@@ -196,7 +243,7 @@
       stroke-linejoin: round;
     }
     button.action.danger {
-      color: #b04452;
+      color: #a35b61;
     }
     button.action.deleting {
       width: 66px;
@@ -218,12 +265,12 @@
       display: flex;
       align-items: center;
       flex-wrap: nowrap;
-      gap: 8px;
+      flex: 0 0 auto;
+      gap: 6px;
       margin: 0 2px 10px;
-      padding: 8px;
-      border: 1px solid #e3e8f0;
-      border-radius: 9px;
-      background: #fbfcfe;
+      padding: 0;
+      border: 0;
+      background: transparent;
     }
     .tools input[type="search"], .tools select {
       display: block;
@@ -237,7 +284,7 @@
       color: #222;
       font: inherit;
     }
-    .tools input[type="search"] { flex: 1 1 180px; width: auto; min-width: 0; }
+    .tools input[type="search"] { flex: 0 1 280px; width: 280px; min-width: 180px; }
     .tools select { flex: 0 0 auto !important; width: auto !important; min-width: 86px; }
     .tools button.action { flex: 0 0 auto; white-space: nowrap; }
     .tools [role="group"] {
@@ -249,24 +296,36 @@
       width: auto;
     }
     .tools .action:disabled, .pager button:disabled { cursor: not-allowed; opacity: .45; }
-    #selected-count { color: #7c8799; font-size: 12px; margin-left: auto; }
     .pager {
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 12px 8px 2px;
+      gap: 8px;
+      min-height: 38px;
+      padding: 7px 4px 0;
+    }
+    .pager select {
+      width: auto !important;
+      min-width: 84px;
+      height: 30px;
+      margin: 0 8px 0 0;
+      padding: 0 8px;
+      border-color: #cfdfd0;
+      border-radius: 8px;
+      background-color: #fffffc;
+      font-size: 12px;
     }
     .pager button {
       min-height: 30px;
       padding: 0 10px;
-      border: 1px solid #d4dbe6;
-      border-radius: 7px;
-      background: #fff;
-      color: #315da8;
+      border: 1px solid #cfdfd0;
+      border-radius: 8px;
+      background: #fffffc;
+      color: #4d7657;
       text-decoration: none;
     }
-    .pager button:hover:not(:disabled) { border-color: #aeb8ca; background: #f6f8fc; }
+    .pager button:hover:not(:disabled) { border-color: #9fbea4; background: #f2f8f1; }
     #page-info { min-width: 125px; text-align: center; color: #7c8799; font-size: 12px; }
     .preview-modal {
       display: none;
@@ -300,33 +359,31 @@
     .preview-loading { color: #7c8799; text-align: center; }
     :root {
       --pico-font-size: 14px;
-      --pico-primary: #2866d8;
-      --pico-primary-hover: #1d4fae;
-      --pico-primary-focus: rgb(40 102 216 / 18%);
+      --pico-primary: #5f8969;
+      --pico-primary-hover: #416e4d;
+      --pico-primary-focus: rgb(95 137 105 / 18%);
       --pico-form-element-spacing-vertical: .38rem;
       --pico-form-element-spacing-horizontal: .6rem;
     }
-    body { background: #fff; }
-    .wrap { padding-top: 22px; }
+    body { background: #fbfdf8; }
     .head { padding: 0 2px 2px; }
     .brand { letter-spacing: .01em; }
     .drop {
       box-shadow: 0 2px 8px rgb(36 64 108 / 4%);
     }
-    .bar { margin-top: 20px; }
     .tools input[type="search"], .tools select {
-      border-color: #d4dbe6;
+      border-color: #cfdfd0;
       box-shadow: none;
       font-size: 12px;
     }
     .tools input[type="search"]:focus, .tools select:focus,
     .mkdir-form input:focus {
-      border-color: #8eafe8;
-      box-shadow: 0 0 0 2px rgb(40 102 216 / 10%);
+      border-color: #8fb398;
+      box-shadow: 0 0 0 2px rgb(95 137 105 / 10%);
     }
     button.action {
       min-height: 28px;
-      border-color: #d4dbe6;
+      border-color: #cfdfd0;
       font-size: 12px;
       box-shadow: none;
     }
@@ -334,22 +391,51 @@
     .list {
       box-shadow: 0 2px 10px rgb(36 64 108 / 4%);
     }
-    .row { min-height: 42px; }
-    .row.muted { min-height: 36px; background: #fbfcfe; }
+    .row { min-height: 38px; }
+    .row.muted {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      min-height: 30px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      background: #f4f8f2;
+    }
     .sort-head {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      min-height: 25px;
-      padding: 0 4px;
+      justify-content: flex-start;
+      gap: 5px;
+      min-height: 20px;
+      padding: 0;
       border: 0;
-      color: #65748a;
+      color: #68786c;
       background: transparent;
       font-size: 12px;
       font-weight: 600;
       text-decoration: none;
     }
-    .sort-head:hover, .sort-head.active { color: #2866d8; background: #eef4ff; }
+      box-shadow: none;
+      outline: none;
+    }
+    .sort-head:hover, .sort-head:focus, .sort-head:active, .sort-head.active {
+      color: #4f7659;
+      background: transparent;
+      box-shadow: none;
+      outline: none;
+    }
+    .sort-icon {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 0;
+      width: 9px;
+      color: #aab7ac;
+      font-size: 7px;
+      line-height: 6px;
+      text-align: center;
+    }
+    .sort-head.active .sort-icon { color: #5f8969; font-size: 9px; line-height: 10px; }
+    .sort-label { white-space: nowrap; }
     .pager button { font-size: 12px; }
     .mkdir-box, .preview-box { box-shadow: 0 12px 36px rgb(31 51 84 / 16%); }
     label {
@@ -452,7 +538,7 @@
     }
     @media (max-width: 650px) {
       .wrap {
-        padding: 16px 10px;
+        padding: 12px 9px 8px;
       }
       .drop {
         display: flex;
@@ -481,7 +567,7 @@
       .bar-right {
         width: 100%;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-end;
         gap: 8px 10px;
       }
       .bar-right #usage {
@@ -508,7 +594,9 @@
       .tools { align-items: stretch; }
       .tools { flex-wrap: wrap; }
       .tools input[type="search"] { flex: 1 1 100%; }
-      #selected-count { margin-left: 0; }
+      .tools input[type="search"] { width: 100%; min-width: 0; }
+      .pager { gap: 5px; }
+      .pager select { margin-right: 0; min-width: 78px; }
       .mkdir-box {
         width: 100%;
         max-width: 320px;
@@ -516,6 +604,8 @@
       }
     }
   </style>
+  </head>
+  <body>
   <main class="wrap">
     <header class="head">
       <div>
@@ -532,7 +622,6 @@
     </section>
     <div class="bar">
       <div class="bar-left">
-        <button type="button" id="back" hidden>返回上级</button>
         <span id="crumb" class="muted">根目录</span>
       </div>
       <div class="bar-right">
@@ -544,20 +633,14 @@
           </svg>
           新建目录
         </button>
+        <div role="group" aria-label="批量操作">
+          <button type="button" class="action" id="batch-download" disabled>批量下载</button>
+          <button type="button" class="action danger" id="batch-delete" disabled>批量删除</button>
+        </div>
       </div>
     </div>
     <div class="tools">
       <input id="search" type="search" placeholder="搜索当前目录" aria-label="搜索当前目录" />
-      <select id="page-size" aria-label="每页数量">
-        <option value="10">10 条/页</option>
-        <option value="30">30 条/页</option>
-        <option value="50">50 条/页</option>
-      </select>
-      <div role="group" aria-label="批量操作">
-        <button type="button" class="action" id="batch-download" disabled>批量下载</button>
-        <button type="button" class="action danger" id="batch-delete" disabled>批量删除</button>
-      </div>
-      <span id="selected-count"></span>
     </div>
     <div id="mkdir-form" class="mkdir-form">
       <div class="mkdir-box">
@@ -579,11 +662,16 @@
     </div>
     <section class="list">
       <div class="row muted">
-        <b></b><button type="button" class="sort-head" id="sort-name" data-label="名称" aria-sort="ascending">名称</button><button type="button" class="sort-head" id="sort-size" data-label="大小" aria-sort="none">大小</button><button type="button" class="sort-head date" id="sort-modified" data-label="修改时间" aria-sort="none">修改时间</button><b></b>
+        <b></b><button type="button" class="sort-head" id="sort-name" data-label="名称" aria-sort="ascending"><span class="sort-label">名称</span><span class="sort-icon" aria-hidden="true">▲▼</span></button><button type="button" class="sort-head" id="sort-size" data-label="大小" aria-sort="none"><span class="sort-label">大小</span><span class="sort-icon" aria-hidden="true">▲▼</span></button><button type="button" class="sort-head date" id="sort-modified" data-label="修改时间" aria-sort="none"><span class="sort-label">修改时间</span><span class="sort-icon" aria-hidden="true">▲▼</span></button><b></b>
       </div>
       <div id="items"></div>
     </section>
     <div class="pager">
+      <select id="page-size" aria-label="每页数量">
+        <option value="10">10 条/页</option>
+        <option value="30">30 条/页</option>
+        <option value="50">50 条/页</option>
+      </select>
       <button type="button" id="prev-page" disabled>上一页</button>
       <span id="page-info"></span>
       <button type="button" id="next-page" disabled>下一页</button>
@@ -591,11 +679,12 @@
   </main>
   <div id="preview-modal" class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-title">
     <div class="preview-box">
-      <div class="preview-head"><h2 id="preview-title">预览</h2><button type="button" id="preview-close" aria-label="关闭">关闭</button></div>
+      <div class="preview-head"><h2 id="preview-title">预览</h2><button type="button" id="preview-close" aria-label="关闭">×</button></div>
       <div id="preview-body" class="preview-body"></div>
     </div>
   </div>
   <script src="/vendor/marked.min.js" defer></script>
   <script src="/vendor/purify.min.js" defer></script>
   <script src="/app.js?v=3" defer></script>
+  </body>
 </html>

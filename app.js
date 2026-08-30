@@ -48,7 +48,6 @@
     const disabled = selected.size === 0;
     $("batch-download").disabled = disabled;
     $("batch-delete").disabled = disabled;
-    $("selected-count").textContent = disabled ? "" : `已选 ${selected.size} 项`;
   }
 
   function render() {
@@ -58,7 +57,6 @@
     const start = (page - 1) * pageSize;
     const visible = items.slice(start, start + pageSize);
     $("crumb").textContent = cur ? "根目录 / " + cur : "根目录";
-    $("back").hidden = !cur;
     $("usage").textContent = fmt(source.usage) + " / 500 GB";
     $("page-info").textContent = `${page} / ${pages} · 共 ${items.length} 项`;
     $("prev-page").disabled = page <= 1;
@@ -67,18 +65,18 @@
       const button = $("sort-" + key);
       button.classList.toggle("active", sortBy === key);
       button.setAttribute("aria-sort", sortBy === key ? sortDirection : "none");
-      button.textContent = button.dataset.label + (sortBy === key ? (sortDirection === "asc" ? " ↑" : " ↓") : "");
+      button.querySelector(".sort-icon").textContent = sortBy === key ? (sortDirection === "asc" ? "▲" : "▼") : "▲▼";
     });
 
     $("items").innerHTML = visible.map((item) => {
       if (item.kind === "folder") {
-        return `<div class="row" data-folder="${encodeURIComponent(item.name)}"><div class="select-cell"></div><div class="name folder">📁 ${esc(item.name)}</div><div></div><div class="date"></div><div></div></div>`;
+        return `<div class="row" data-folder="${encodeURIComponent(item.name)}"><div class="select-cell"></div><div class="name folder" data-tooltip="${esc(item.name)}"><span class="name-text">📁 ${esc(item.name)}</span></div><div></div><div class="date"></div><div></div></div>`;
       }
       const encoded = encodeURIComponent(item.name);
       const checked = selected.has(item.name) ? " checked" : "";
       const preview = previewExtensions.has(extension(item.name))
         ? `<button type="button" class="action" data-preview="${encoded}"><span class="icon">${previewIcon}</span>预览</button>` : "";
-      return `<div class="row" data-download="${encoded}"><div class="select-cell"><input class="file-check" type="checkbox" data-select="${encoded}"${checked} aria-label="选择 ${esc(item.name)}"></div><div class="name">📄 ${esc(item.name)}</div><div class="muted">${fmt(item.size)}</div><div class="muted date">${new Date(item.modified).toLocaleString()}</div><div class="ops">${preview}<button type="button" class="action" data-download="${encoded}"><span class="icon">${downloadIcon}</span>下载</button><button type="button" class="action danger" data-delete="${encoded}"><span class="icon">${deleteIcon}</span>删除</button></div></div>`;
+      return `<div class="row" data-download="${encoded}"><div class="select-cell"><input class="file-check" type="checkbox" data-select="${encoded}"${checked} aria-label="选择 ${esc(item.name)}"></div><div class="name" data-tooltip="${esc(item.name)}"><span class="name-text">📄 ${esc(item.name)}</span></div><div class="muted">${fmt(item.size)}</div><div class="muted date">${new Date(item.modified).toLocaleString()}</div><div class="ops">${preview}<button type="button" class="action" data-download="${encoded}"><span class="icon">${downloadIcon}</span>下载</button><button type="button" class="action danger" data-delete="${encoded}"><span class="icon">${deleteIcon}</span>删除</button></div></div>`;
     }).join("") || '<div class="empty">没有符合条件的文件</div>';
     updateBatchButtons();
   }
@@ -202,7 +200,6 @@
     load();
   }
 
-  $("back").onclick = goBack;
   $("items").onclick = (event) => {
     const select = event.target.closest("[data-select]");
     if (select) { event.stopPropagation(); return; }
@@ -222,6 +219,7 @@
     checkbox.checked ? selected.add(name) : selected.delete(name);
     updateBatchButtons();
   };
+  $("crumb").onclick = () => { if (cur) { cur = ""; selected.clear(); page = 1; load(); } };
   $("search").oninput = (event) => { query = event.target.value; page = 1; render(); };
   $("page-size").onchange = (event) => { pageSize = Number(event.target.value); page = 1; render(); };
   ["name", "size", "modified"].forEach((key) => {
