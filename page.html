@@ -336,6 +336,20 @@
     }
     .row { min-height: 42px; }
     .row.muted { min-height: 36px; background: #fbfcfe; }
+    .sort-head {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-height: 25px;
+      padding: 0 4px;
+      border: 0;
+      color: #65748a;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .sort-head:hover, .sort-head.active { color: #2866d8; background: #eef4ff; }
     .pager button { font-size: 12px; }
     .mkdir-box, .preview-box { box-shadow: 0 12px 36px rgb(31 51 84 / 16%); }
     label {
@@ -534,14 +548,6 @@
     </div>
     <div class="tools">
       <input id="search" type="search" placeholder="搜索当前目录" aria-label="搜索当前目录" />
-      <div role="group" aria-label="排序">
-        <select id="sort-by" aria-label="排序方式">
-          <option value="name">按名称</option>
-          <option value="size">按大小</option>
-          <option value="modified">按更新时间</option>
-        </select>
-        <button type="button" class="action" id="sort-direction">升序</button>
-      </div>
       <select id="page-size" aria-label="每页数量">
         <option value="10">10 条/页</option>
         <option value="30">30 条/页</option>
@@ -573,7 +579,7 @@
     </div>
     <section class="list">
       <div class="row muted">
-        <b></b><b>名称</b><b>大小</b><b class="date">修改时间</b><b></b>
+        <b></b><button type="button" class="sort-head" id="sort-name" data-label="名称" aria-sort="ascending">名称</button><button type="button" class="sort-head" id="sort-size" data-label="大小" aria-sort="none">大小</button><button type="button" class="sort-head date" id="sort-modified" data-label="修改时间" aria-sort="none">修改时间</button><b></b>
       </div>
       <div id="items"></div>
     </section>

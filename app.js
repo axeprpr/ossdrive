@@ -63,6 +63,12 @@
     $("page-info").textContent = `${page} / ${pages} · 共 ${items.length} 项`;
     $("prev-page").disabled = page <= 1;
     $("next-page").disabled = page >= pages;
+    ["name", "size", "modified"].forEach((key) => {
+      const button = $("sort-" + key);
+      button.classList.toggle("active", sortBy === key);
+      button.setAttribute("aria-sort", sortBy === key ? sortDirection : "none");
+      button.textContent = button.dataset.label + (sortBy === key ? (sortDirection === "asc" ? " ↑" : " ↓") : "");
+    });
 
     $("items").innerHTML = visible.map((item) => {
       if (item.kind === "folder") {
@@ -218,8 +224,14 @@
   };
   $("search").oninput = (event) => { query = event.target.value; page = 1; render(); };
   $("page-size").onchange = (event) => { pageSize = Number(event.target.value); page = 1; render(); };
-  $("sort-by").onchange = (event) => { sortBy = event.target.value; page = 1; render(); };
-  $("sort-direction").onclick = () => { sortDirection = sortDirection === "asc" ? "desc" : "asc"; $("sort-direction").textContent = sortDirection === "asc" ? "升序" : "降序"; render(); };
+  ["name", "size", "modified"].forEach((key) => {
+    $("sort-" + key).onclick = () => {
+      if (sortBy === key) sortDirection = sortDirection === "asc" ? "desc" : "asc";
+      else { sortBy = key; sortDirection = "asc"; }
+      page = 1;
+      render();
+    };
+  });
   $("prev-page").onclick = () => { if (page > 1) { page--; render(); } };
   $("next-page").onclick = () => { page++; render(); };
   $("batch-download").onclick = batchDownload;
