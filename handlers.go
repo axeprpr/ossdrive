@@ -251,7 +251,8 @@ func (a *app) uploadURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var request struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		ContentType string `json:"content_type"`
 	}
 	if json.NewDecoder(r.Body).Decode(&request) != nil {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid request"})
@@ -262,7 +263,11 @@ func (a *app) uploadURL(w http.ResponseWriter, r *http.Request) {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	url, err := a.bucket.SignURL(key, oss.HTTPPut, 900)
+	contentType := request.ContentType
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	url, err := a.bucket.SignURL(key, oss.HTTPPut, 900, oss.ContentType(contentType))
 	if err != nil {
 		jsonOut(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 		return

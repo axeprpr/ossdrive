@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Download, FolderPlus, RefreshCw, Search, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, FolderPlus, FolderUp, RefreshCw, Search, Trash2, X } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { FileTable } from "./components/file-table";
 import { PreviewDialog } from "./components/preview-dialog";
@@ -89,10 +89,12 @@ export default function App() {
       try {
         const startedAt = performance.now();
         setUploading(file.name);
-        const signed = await postJson<{ url: string }>("/api/upload-url", { name: fullName(file.name) });
+        const contentType = file.type || "application/octet-stream";
+        const signed = await postJson<{ url: string }>("/api/upload-url", { name: fullName(file.name), content_type: contentType });
         await new Promise<void>((resolve, reject) => {
           const request = new XMLHttpRequest();
           request.open("PUT", signed.url);
+          request.setRequestHeader("Content-Type", contentType);
           request.upload.onprogress = (event) => {
             if (!event.lengthComputable) return;
             const percent = Math.round(event.loaded / event.total * 100);
@@ -187,10 +189,10 @@ export default function App() {
         </section>
 
         <div className="mb-2 flex min-w-0 shrink-0 items-center gap-2">
-          <IconButton label="返回上一级" disabled={!path} onClick={() => { setPath(path.split("/").slice(0, -1).join("/")); setPage(1); }}><ArrowLeft className="h-[18px] w-[18px]" /></IconButton>
+          <IconButton label="返回上一级" disabled={!path} onClick={() => { setPath(path.split("/").slice(0, -1).join("/")); setPage(1); }}><FolderUp className="h-[18px] w-[18px]" /></IconButton>
           <div className="relative min-w-24 max-w-[260px] flex-1">
             <Search className="absolute left-2 top-2 h-4 w-4 text-[#8fa493]" />
-            <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="搜索" className="h-8 w-full rounded-md border border-[#cfdfd0] bg-[#fffffc] pl-8 pr-7 text-xs outline-none focus:border-[#8fb398] focus:ring-2 focus:ring-[#dcecdc]" />
+            <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="搜索" className="h-9 w-full rounded-md border border-[#cfdfd0] bg-[#fffffc] pl-8 pr-7 text-xs outline-none focus:border-[#8fb398] focus:ring-2 focus:ring-[#dcecdc]" />
             {query && <button aria-label="清除搜索" className="absolute right-1.5 top-1.5 rounded p-0.5 text-[#829488] hover:bg-[#edf6eb]" onClick={() => setQuery("")}><X className="h-4 w-4" /></button>}
           </div>
           <span className="ml-auto hidden whitespace-nowrap text-xs text-[#829488] md:block">{formatSize(listing.usage)} / 500 GB</span>
@@ -203,8 +205,8 @@ export default function App() {
         <FileTable items={listing.items} selected={selected} deleting={deleting} sort={sort} direction={direction} onSort={sortBy} onOpenFolder={(name) => { setPath(fullName(name)); setPage(1); }} onToggle={(name, checked) => { const next = new Set(selected); checked ? next.add(name) : next.delete(name); setSelected(next); }} onPreview={(name) => void openPreview(name)} onDownload={(name) => { location.href = downloadUrl(name); }} onDelete={(name, kind = "file") => kind === "folder" ? setDeleteTarget({ name, kind }) : void remove(name)} />
 
         <footer className="flex shrink-0 items-center justify-between gap-2 pt-3 sm:gap-3">
-          <span className="min-w-0 max-w-[35%] truncate text-xs text-[#829488]" title={path || "根目录"}>{path || "根目录"}</span>
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
+          <span className="min-w-0 max-w-[35%] truncate pl-[30px] text-xs text-[#829488]" title={path || "/"}>{path || "/"}</span>
+          <div className="flex items-center justify-center gap-2 pr-[30px] sm:gap-3">
           <Select value={String(pageSize)} onValueChange={(value) => { setPageSize(Number(value)); setPage(1); }}>
             <SelectTrigger aria-label="每页数量"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="10">10 条/页</SelectItem><SelectItem value="30">30 条/页</SelectItem><SelectItem value="50">50 条/页</SelectItem></SelectContent>
