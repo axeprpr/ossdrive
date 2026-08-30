@@ -94,6 +94,7 @@
       justify-content: space-between;
       gap: 14px;
       margin: 4px 2px 8px;
+      min-height: 34px;
     }
     .bar-left,
     .bar-right {
@@ -125,6 +126,7 @@
       display: flex;
       align-items: center;
       flex-wrap: nowrap;
+      height: 32px;
       justify-content: flex-end;
       gap: 6px;
     }
@@ -135,6 +137,7 @@
       width: auto;
       margin: 0;
       gap: 6px;
+      height: 32px;
     }
     .bar-right button.action { width: auto !important; min-width: max-content; white-space: nowrap; }
     #usage {
@@ -432,6 +435,7 @@
       outline: none;
       width: auto !important;
     }
+    #sort-name { padding-left: 30px; }
     }
     .sort-head:hover, .sort-head:focus, .sort-head:active, .sort-head.active {
       color: #4f7659;
@@ -575,6 +579,7 @@
         align-items: stretch;
         gap: 10px;
         margin-top: 16px;
+        min-height: 0;
       }
       .bar-left {
         width: 100%;
@@ -584,6 +589,7 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         gap: 8px 10px;
+        height: auto;
       }
       .bar-right #usage {
         text-align: right;
