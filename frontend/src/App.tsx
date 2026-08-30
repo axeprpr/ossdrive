@@ -192,7 +192,7 @@ export default function App() {
           <IconButton label="返回上一级" disabled={!path} onClick={() => { setPath(path.split("/").slice(0, -1).join("/")); setPage(1); }}><FolderUp className="h-[18px] w-[18px]" /></IconButton>
           <div className="relative min-w-24 max-w-[260px] flex-1">
             <Search className="absolute left-2 top-2 h-4 w-4 text-[#8fa493]" />
-            <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="搜索" className="h-9 w-full rounded-md border border-[#cfdfd0] bg-[#fffffc] pl-8 pr-7 text-xs outline-none focus:border-[#8fb398] focus:ring-2 focus:ring-[#dcecdc]" />
+            <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="搜索" className="h-8 w-full rounded-md border border-[#cfdfd0] bg-[#fffffc] pl-8 pr-7 text-xs outline-none focus:border-[#8fb398] focus:ring-2 focus:ring-[#dcecdc]" />
             {query && <button aria-label="清除搜索" className="absolute right-1.5 top-1.5 rounded p-0.5 text-[#829488] hover:bg-[#edf6eb]" onClick={() => setQuery("")}><X className="h-4 w-4" /></button>}
           </div>
           <span className="ml-auto hidden whitespace-nowrap text-xs text-[#829488] md:block">{formatSize(listing.usage)} / 500 GB</span>
@@ -204,7 +204,7 @@ export default function App() {
 
         <FileTable items={listing.items} selected={selected} deleting={deleting} sort={sort} direction={direction} onSort={sortBy} onOpenFolder={(name) => { setPath(fullName(name)); setPage(1); }} onToggle={(name, checked) => { const next = new Set(selected); checked ? next.add(name) : next.delete(name); setSelected(next); }} onPreview={(name) => void openPreview(name)} onDownload={(name) => { location.href = downloadUrl(name); }} onDelete={(name, kind = "file") => kind === "folder" ? setDeleteTarget({ name, kind }) : void remove(name)} />
 
-        <footer className="flex shrink-0 items-center justify-between gap-2 py-3 sm:gap-3">
+        <footer className="flex shrink-0 items-center justify-between gap-2 py-2 sm:gap-3">
           <span className="min-w-0 max-w-[35%] truncate pl-[30px] text-xs text-[#829488]" title={path || "/"}>{path || "/"}</span>
           <div className="flex items-center justify-center gap-2 pr-[30px] sm:gap-3">
           <Select value={String(pageSize)} onValueChange={(value) => { setPageSize(Number(value)); setPage(1); }}>
@@ -221,7 +221,7 @@ export default function App() {
       <Dialog open={mkdirOpen} onOpenChange={setMkdirOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>新建目录</DialogTitle><DialogDescription>仅支持中文、英文、数字、- 和 _</DialogDescription></DialogHeader>
-          <input autoFocus value={mkdirName} onChange={(event) => setMkdirName(event.target.value)} onKeyDown={(event) => event.key === "Enter" && void mkdir()} placeholder="输入目录名称" className="h-9 w-full rounded-md border border-[#cfdfd0] px-3 text-sm outline-none focus:ring-2 focus:ring-[#dcecdc]" />
+          <input autoFocus value={mkdirName} onChange={(event) => setMkdirName(event.target.value)} onKeyDown={(event) => event.key === "Enter" && void mkdir()} placeholder="输入目录名称" className="h-8 w-full rounded-md border border-[#cfdfd0] px-3 text-sm outline-none focus:ring-2 focus:ring-[#dcecdc]" />
           <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setMkdirOpen(false)}>取消</Button><Button onClick={() => void mkdir()}>创建</Button></div>
         </DialogContent>
       </Dialog>
