@@ -93,7 +93,7 @@ export function FileTable({ items, selected, deleting, sort, direction, onSort, 
           <div className={cn("hidden items-center sm:grid", desktopGridClass)}><span /><FileName item={item} /><span /><span /><FileActions item={item} deleting={deleting} onPreview={onPreview} onDownload={onDownload} onDelete={onDelete} /></div>
         </div>
       ) : (
-        <div key={item.name} className="cursor-pointer border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]" onClick={() => onDownload(item.name)}>
+        <div key={item.name} className="border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]">
           <div className="grid grid-cols-[28px_minmax(0,1fr)_104px] items-center sm:hidden">
             <span onClick={(event) => event.stopPropagation()}><Checkbox checked={selected.has(item.name)} onCheckedChange={(checked) => onToggle(item.name, checked === true)} /></span>
             <FileName item={item} />
