@@ -13,6 +13,8 @@
 - 按客户端 IP 限制上传地址请求频率
 - 在当前目录创建子目录
 - 上传、下载失败时在页面内显示可关闭的错误提示
+- 服务端分页、搜索和排序，默认每页 10 条
+- 图片、视频、TXT 和 Markdown 预览
 - 下载文件名通过事件委托处理，避免特殊字符破坏前端脚本
 
 ## Agent 技能说明
@@ -26,8 +28,9 @@
 ## 文件操作 API
 
 ```text
-GET  /api/list?prefix=<目录>
+GET  /api/list?prefix=<目录>&page=1&page_size=10&query=&sort=name&direction=asc
 POST /api/upload-url       {"name":"文件名"}
+POST /api/upload-complete  {"name":"文件名"}
 GET  /api/download-url?name=<文件名>
 POST /api/delete           {"name":"文件名"}
 POST /api/mkdir            {"name":"目录名"}

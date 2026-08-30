@@ -1,0 +1,86 @@
+import { ChevronDown, ChevronUp, Download, Eye, Loader2, Trash2 } from "lucide-react";
+import { Checkbox } from "./ui/checkbox";
+import { IconButton } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { cn, formatSize } from "../lib/utils";
+import type { DriveItem, SortDirection, SortKey } from "../types";
+import { previewExtensions } from "./preview-dialog";
+
+const gridClass = "grid grid-cols-[28px_minmax(0,1fr)_72px_104px] sm:grid-cols-[28px_minmax(0,1fr)_88px_145px_112px]";
+const extension = (name: string) => name.includes(".") ? name.split(".").pop()!.toLowerCase() : "";
+
+function SortButton({ label, active, direction, onClick, className }: {
+  label: string;
+  active: boolean;
+  direction: SortDirection;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button type="button" className={cn("flex items-center gap-1 bg-transparent p-0 text-left text-xs font-semibold text-[#68786c] outline-none", className)} onClick={onClick}>
+      <span>{label}</span>
+      <span className={active ? "text-[#5f8969]" : "text-[#aab7ac]"}>
+        {active ? direction === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" /> : (
+          <span className="flex flex-col -space-y-1.5"><ChevronUp className="h-2.5 w-2.5" /><ChevronDown className="h-2.5 w-2.5" /></span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+function FileName({ item }: { item: DriveItem }) {
+  return (
+    <TooltipProvider delayDuration={450}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={cn("truncate", item.kind === "folder" && "font-semibold text-[#4f7c5b]")}>{item.kind === "folder" ? "📁" : "📄"} {item.name}</span>
+        </TooltipTrigger>
+        <TooltipContent>{item.name}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+export function FileTable({ items, selected, deleting, sort, direction, onSort, onOpenFolder, onToggle, onPreview, onDownload, onDelete }: {
+  items: DriveItem[];
+  selected: Set<string>;
+  deleting: string | null;
+  sort: SortKey;
+  direction: SortDirection;
+  onSort: (key: SortKey) => void;
+  onOpenFolder: (name: string) => void;
+  onToggle: (name: string, checked: boolean) => void;
+  onPreview: (name: string) => void;
+  onDownload: (name: string) => void;
+  onDelete: (name: string) => void;
+}) {
+  return (
+    <section className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[#dce7dc] bg-white shadow-sm" style={{ scrollbarGutter: "stable" }}>
+      <div className={cn(gridClass, "sticky top-0 z-10 border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c]") }>
+        <span />
+        <SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} />
+        <SortButton label="大小" active={sort === "size"} direction={direction} onClick={() => onSort("size")} />
+        <SortButton label="修改时间" active={sort === "modified"} direction={direction} onClick={() => onSort("modified")} className="hidden sm:flex" />
+        <span />
+      </div>
+      {items.length === 0 && <div className="flex h-32 items-center justify-center text-sm text-[#829488]">当前目录没有内容</div>}
+      {items.map((item) => item.kind === "folder" ? (
+        <div key={item.name} className={cn(gridClass, "cursor-pointer items-center border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]")} onClick={() => onOpenFolder(item.name)}>
+          <span /><FileName item={item} /><span /><span className="hidden sm:block" /><span />
+        </div>
+      ) : (
+        <div key={item.name} className={cn(gridClass, "cursor-pointer items-center border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]")} onClick={() => onDownload(item.name)}>
+          <span onClick={(event) => event.stopPropagation()}><Checkbox checked={selected.has(item.name)} onCheckedChange={(checked) => onToggle(item.name, checked === true)} /></span>
+          <FileName item={item} />
+          <span className="text-xs text-[#718c78]">{formatSize(item.size)}</span>
+          <span className="hidden text-xs text-[#718c78] sm:block">{new Date(item.modified).toLocaleString()}</span>
+          <span className="flex justify-end gap-1" onClick={(event) => event.stopPropagation()}>
+            {previewExtensions.has(extension(item.name)) && <IconButton label="预览" onClick={() => onPreview(item.name)}><Eye className="h-[18px] w-[18px]" /></IconButton>}
+            <IconButton label="下载" onClick={() => onDownload(item.name)}><Download className="h-[18px] w-[18px]" /></IconButton>
+            <IconButton label="删除" variant="destructive" disabled={deleting === item.name} onClick={() => onDelete(item.name)}>{deleting === item.name ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Trash2 className="h-[18px] w-[18px]" />}</IconButton>
+          </span>
+        </div>
+      ))}
+    </section>
+  );
+}

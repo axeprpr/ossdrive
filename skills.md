@@ -22,10 +22,15 @@ curl -fsS '{{BASE_URL}}/api/list'
 
 ```bash
 curl -fsS --get '{{BASE_URL}}/api/list' \
-  --data-urlencode 'prefix=目录名'
+  --data-urlencode 'prefix=目录名' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'page_size=10' \
+  --data-urlencode 'query=' \
+  --data-urlencode 'sort=name' \
+  --data-urlencode 'direction=asc'
 ```
 
-返回 JSON：`files` 是当前层文件列表，`folders` 是当前层目录列表，`usage` 是已列出对象的字节数。文件项包含 `name`、`size` 和 `modified`。
+返回 JSON：`items` 是当前页项目，项目包含 `name`、`kind`、`size` 和 `modified`；`total` 是搜索后的总数，`page` 和 `page_size` 是分页信息，`usage` 是目录快照中的对象字节数。`kind` 为 `folder` 时表示目录。
 
 ## 上传文件
 
@@ -36,6 +41,9 @@ upload_url=$(curl -fsS '{{BASE_URL}}/api/upload-url' \
   -H 'Content-Type: application/json' \
   --data '{"name":"目录/文件名.ext"}' | jq -r '.url')
 curl -fS -X PUT "$upload_url" --upload-file '/本地路径/文件名.ext'
+curl -fsS '{{BASE_URL}}/api/upload-complete' \
+  -H 'Content-Type: application/json' \
+  --data '{"name":"目录/文件名.ext"}'
 ```
 
 请求上传地址按客户端 IP 限制为每分钟最多 10 次。上传地址有效期有限，获取后应立即使用；不要重复请求或重复上传。HTTP `2xx` 表示上传成功。
