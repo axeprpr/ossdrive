@@ -51,10 +51,10 @@ jobs:
           sshpass -e scp -o StrictHostKeyChecking=no ossdrive-linux-amd64 "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ossdrive-linux-amd64"
           sshpass -e ssh -o StrictHostKeyChecking=no "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "SUDO_PASSWORD='$SSHPASS' bash -s" <<'REMOTE'
           set -euo pipefail
-          printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker inspect ossdrive-test --format '{{range .Config.Env}}{{println .}}{{end}}' | awk '/^(OSS_|PORT=)/' > /tmp/ossdrive-test.env
+          env_lines=$(printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker inspect ossdrive-test --format '{{range .Config.Env}}{{println .}}{{end}}' | awk '/^(OSS_|PORT=)/')
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker stop ossdrive-test || true
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker rm ossdrive-test || true
-          env_args=(); while IFS= read -r line; do env_args+=("-e" "$line"); done < /tmp/ossdrive-test.env
+          env_args=(); while IFS= read -r line; do env_args+=("-e" "$line"); done <<< "$env_lines"
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker create --name ossdrive-test --restart unless-stopped -p 5001:3000 "${env_args[@]}" -e PORT=3000 alpine:3.20 /ossdrive
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker cp /tmp/ossdrive-linux-amd64 ossdrive-test:/ossdrive
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker start ossdrive-test
@@ -78,10 +78,10 @@ jobs:
           sshpass -e scp -o StrictHostKeyChecking=no ossdrive-linux-amd64 "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ossdrive-linux-amd64"
           sshpass -e ssh -o StrictHostKeyChecking=no "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "SUDO_PASSWORD='$SSHPASS' bash -s" <<'REMOTE'
           set -euo pipefail
-          printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker inspect ossdrive --format '{{range .Config.Env}}{{println .}}{{end}}' | awk '/^(OSS_|PORT=)/' > /tmp/ossdrive-production.env
+          env_lines=$(printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker inspect ossdrive --format '{{range .Config.Env}}{{println .}}{{end}}' | awk '/^(OSS_|PORT=)/')
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker stop ossdrive || true
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker rm ossdrive || true
-          env_args=(); while IFS= read -r line; do env_args+=("-e" "$line"); done < /tmp/ossdrive-production.env
+          env_args=(); while IFS= read -r line; do env_args+=("-e" "$line"); done <<< "$env_lines"
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker create --name ossdrive --restart unless-stopped -p 5000:3000 "${env_args[@]}" -e PORT=3000 alpine:3.20 /ossdrive
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker cp /tmp/ossdrive-linux-amd64 ossdrive:/ossdrive
           printf '%s\n' "$SUDO_PASSWORD" | sudo -S docker start ossdrive
