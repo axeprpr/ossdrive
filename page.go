@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//go:embed page.html app.js assets/logo.svg assets/marked.min.js assets/purify.min.js
+//go:embed page.html app.js assets/logo.svg assets/pico.min.css assets/marked.min.js assets/purify.min.js
 var pageFiles embed.FS
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +50,7 @@ func script(w http.ResponseWriter, r *http.Request) {
 
 func vendor(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimPrefix(r.URL.Path, "/vendor/")
-	if name != "marked.min.js" && name != "purify.min.js" {
+	if name != "pico.min.css" && name != "marked.min.js" && name != "purify.min.js" {
 		http.NotFound(w, r)
 		return
 	}
@@ -59,7 +59,11 @@ func vendor(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	if name == "pico.min.css" {
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	} else {
+		w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	}
 	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 	_, _ = w.Write(data)
 }

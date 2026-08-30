@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <meta charset="utf-8" /><meta
     name="viewport"
     content="width=device-width,initial-scale=1"
   /><title>OSS 网盘</title
   ><link rel="icon" href="/logo.svg?v=3" />
+  ><link rel="stylesheet" href="/vendor/pico.min.css" />
   ><style>
     body {
       margin: 0;
@@ -146,6 +147,8 @@
     }
     button {
       border: 0;
+      width: auto;
+      margin: 0;
       padding: 0 5px;
       background: transparent;
       color: #0645ad;
@@ -218,6 +221,7 @@
       display: block;
       box-sizing: border-box;
       height: 32px;
+      margin: 0;
       padding: 0 9px;
       border: 1px solid #c8ced8;
       border-radius: 7px;
@@ -268,6 +272,52 @@
     .markdown-body { line-height: 1.6; }
     .markdown-body img { max-width: 100%; }
     .preview-loading { color: #7c8799; text-align: center; }
+    :root {
+      --pico-font-size: 14px;
+      --pico-primary: #2866d8;
+      --pico-primary-hover: #1d4fae;
+      --pico-primary-focus: rgb(40 102 216 / 18%);
+      --pico-form-element-spacing-vertical: .38rem;
+      --pico-form-element-spacing-horizontal: .6rem;
+    }
+    body { background: #fff; }
+    .wrap { padding-top: 22px; }
+    .head { padding: 0 2px 2px; }
+    .brand { letter-spacing: .01em; }
+    .drop {
+      box-shadow: 0 2px 8px rgb(36 64 108 / 4%);
+    }
+    .bar { margin-top: 20px; }
+    .tools {
+      padding: 8px;
+      border: 1px solid #e3e8f0;
+      border-radius: 9px;
+      background: #fbfcfe;
+    }
+    .tools input[type="search"], .tools select {
+      border-color: #d4dbe6;
+      box-shadow: none;
+      font-size: 12px;
+    }
+    .tools input[type="search"]:focus, .tools select:focus,
+    .mkdir-form input:focus {
+      border-color: #8eafe8;
+      box-shadow: 0 0 0 2px rgb(40 102 216 / 10%);
+    }
+    button.action {
+      min-height: 28px;
+      border-color: #d4dbe6;
+      font-size: 12px;
+      box-shadow: none;
+    }
+    button.action:hover { transform: none; box-shadow: none; }
+    .list {
+      box-shadow: 0 2px 10px rgb(36 64 108 / 4%);
+    }
+    .row { min-height: 42px; }
+    .row.muted { min-height: 36px; background: #fbfcfe; }
+    .pager button { font-size: 12px; }
+    .mkdir-box, .preview-box { box-shadow: 0 12px 36px rgb(31 51 84 / 16%); }
     label {
       display: block;
       color: #0645ad;
@@ -328,6 +378,7 @@
       display: block;
       box-sizing: border-box;
       width: 100%;
+      margin: 0;
       padding: 9px 10px;
       border: 1px solid #c8ced8;
       border-radius: 8px;
