@@ -2,22 +2,25 @@ package main
 
 import (
 	"embed"
+	"io/fs"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-//go:embed page.html app.js assets/logo.svg assets/pico.min.css assets/marked.min.js assets/purify.min.js
+//go:embed page.html app.js assets/logo.svg assets/pico.min.css assets/marked.min.js assets/purify.min.js frontend/dist
 var pageFiles embed.FS
+
+var frontendDist, _ = fs.Sub(pageFiles, "frontend/dist")
 
 func index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		http.FileServer(http.FS(frontendDist)).ServeHTTP(w, r)
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
-	data, err := pageFiles.ReadFile("page.html")
+	data, err := fs.ReadFile(frontendDist, "index.html")
 	if err != nil {
 		http.Error(w, "page unavailable", http.StatusInternalServerError)
 		return

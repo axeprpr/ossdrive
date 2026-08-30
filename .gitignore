@@ -3,3 +3,4 @@
 *.key
 *.pem
 build-*.log
+frontend/node_modules/
