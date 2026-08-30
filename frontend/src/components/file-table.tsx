@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronUp, Download, Eye, Loader2, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { Checkbox } from "./ui/checkbox";
 import { IconButton } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
@@ -29,11 +30,19 @@ function SortButton({ label, active, direction, onClick, className }: {
 }
 
 function FileName({ item }: { item: DriveItem }) {
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [open, setOpen] = useState(false);
+
+  function handleOpenChange(nextOpen: boolean) {
+    const element = textRef.current;
+    setOpen(nextOpen && Boolean(element && element.scrollWidth > element.clientWidth));
+  }
+
   return (
     <TooltipProvider delayDuration={450}>
-      <Tooltip>
+      <Tooltip open={open} onOpenChange={handleOpenChange}>
         <TooltipTrigger asChild>
-          <span className={cn("truncate", item.kind === "folder" && "font-semibold text-[#4f7c5b]")}>{item.kind === "folder" ? "📁" : "📄"} {item.name}</span>
+          <span ref={textRef} className={cn("block w-fit max-w-full truncate", item.kind === "folder" && "font-semibold text-[#4f7c5b]")}>{item.kind === "folder" ? "📁" : "📄"} {item.name}</span>
         </TooltipTrigger>
         <TooltipContent>{item.name}</TooltipContent>
       </Tooltip>
