@@ -75,8 +75,8 @@
       const encoded = encodeURIComponent(item.name);
       const checked = selected.has(item.name) ? " checked" : "";
       const preview = previewExtensions.has(extension(item.name))
-        ? `<button type="button" class="action" data-preview="${encoded}"><span class="icon">${previewIcon}</span>预览</button>` : "";
-      return `<div class="row" data-download="${encoded}"><div class="select-cell"><input class="file-check" type="checkbox" data-select="${encoded}"${checked} aria-label="选择 ${esc(item.name)}"></div><div class="name" data-tooltip="${esc(item.name)}"><span class="name-text">📄 ${esc(item.name)}</span></div><div class="muted">${fmt(item.size)}</div><div class="muted date">${new Date(item.modified).toLocaleString()}</div><div class="ops">${preview}<button type="button" class="action" data-download="${encoded}"><span class="icon">${downloadIcon}</span>下载</button><button type="button" class="action danger" data-delete="${encoded}"><span class="icon">${deleteIcon}</span>删除</button></div></div>`;
+        ? `<button type="button" class="action icon-only" data-preview="${encoded}" title="预览" aria-label="预览"><span class="icon">${previewIcon}</span></button>` : "";
+      return `<div class="row" data-download="${encoded}"><div class="select-cell"><input class="file-check" type="checkbox" data-select="${encoded}"${checked} aria-label="选择 ${esc(item.name)}"></div><div class="name" data-tooltip="${esc(item.name)}"><span class="name-text">📄 ${esc(item.name)}</span></div><div class="muted">${fmt(item.size)}</div><div class="muted date">${new Date(item.modified).toLocaleString()}</div><div class="ops">${preview}<button type="button" class="action icon-only" data-download="${encoded}" title="下载" aria-label="下载"><span class="icon">${downloadIcon}</span></button><button type="button" class="action danger icon-only" data-delete="${encoded}" title="删除" aria-label="删除"><span class="icon">${deleteIcon}</span></button></div></div>`;
     }).join("") || '<div class="empty">没有符合条件的文件</div>';
     updateBatchButtons();
   }
