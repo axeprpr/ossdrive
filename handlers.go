@@ -325,6 +325,7 @@ func (a *app) delete(w http.ResponseWriter, r *http.Request) {
 	}
 	var request struct {
 		Name string `json:"name"`
+		Kind string `json:"kind"`
 	}
 	if json.NewDecoder(r.Body).Decode(&request) != nil {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid request"})
@@ -335,13 +336,37 @@ func (a *app) delete(w http.ResponseWriter, r *http.Request) {
 		jsonOut(w, http.StatusBadRequest, map[string]string{"error": "invalid name"})
 		return
 	}
-	if err = a.bucket.DeleteObject(key); err != nil {
+	if request.Kind == "folder" {
+		err = a.deletePrefix(key + "/")
+	} else {
+		err = a.bucket.DeleteObject(key)
+	}
+	if err != nil {
 		log.Printf("delete %q: %v", key, err)
 		jsonOut(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 		return
 	}
 	a.invalidate(request.Name)
 	jsonOut(w, http.StatusOK, map[string]bool{"ok": true})
+}
+
+func (a *app) deletePrefix(prefix string) error {
+	marker := ""
+	for {
+		listing, err := a.bucket.ListObjects(oss.Prefix(prefix), oss.Marker(marker), oss.MaxKeys(1000))
+		if err != nil {
+			return err
+		}
+		for _, object := range listing.Objects {
+			if err := a.bucket.DeleteObject(object.Key); err != nil {
+				return err
+			}
+		}
+		if !listing.IsTruncated {
+			return nil
+		}
+		marker = listing.NextMarker
+	}
 }
 
 func (a *app) mkdir(w http.ResponseWriter, r *http.Request) {

@@ -55,13 +55,13 @@ function FileActions({ item, deleting, onPreview, onDownload, onDelete }: {
   deleting: string | null;
   onPreview: (name: string) => void;
   onDownload: (name: string) => void;
-  onDelete: (name: string) => void;
+  onDelete: (name: string, kind?: "file" | "folder") => void;
 }) {
   return (
     <span className="flex justify-end gap-1" onClick={(event) => event.stopPropagation()}>
-      {previewExtensions.has(extension(item.name)) && <IconButton label="预览" onClick={() => onPreview(item.name)}><Eye className="h-[18px] w-[18px]" /></IconButton>}
-      <IconButton label="下载" onClick={() => onDownload(item.name)}><Download className="h-[18px] w-[18px]" /></IconButton>
-      <IconButton label="删除" variant="destructive" disabled={deleting === item.name} onClick={() => onDelete(item.name)}>{deleting === item.name ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Trash2 className="h-[18px] w-[18px]" />}</IconButton>
+      {item.kind === "file" && previewExtensions.has(extension(item.name)) && <IconButton label="预览" onClick={() => onPreview(item.name)}><Eye className="h-[18px] w-[18px]" /></IconButton>}
+      {item.kind === "file" && <IconButton label="下载" onClick={() => onDownload(item.name)}><Download className="h-[18px] w-[18px]" /></IconButton>}
+      <IconButton label={item.kind === "folder" ? "删除目录" : "删除"} variant="destructive" disabled={deleting === item.name} onClick={() => onDelete(item.name, item.kind)}>{deleting === item.name ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Trash2 className="h-[18px] w-[18px]" />}</IconButton>
     </span>
   );
 }
@@ -77,19 +77,20 @@ export function FileTable({ items, selected, deleting, sort, direction, onSort, 
   onToggle: (name: string, checked: boolean) => void;
   onPreview: (name: string) => void;
   onDownload: (name: string) => void;
-  onDelete: (name: string) => void;
+  onDelete: (name: string, kind?: "file" | "folder") => void;
 }) {
   return (
-    <section className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[#dce7dc] bg-white shadow-sm" style={{ scrollbarGutter: "stable" }}>
-      <div className="sticky top-0 z-10 border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:hidden"><div className="grid grid-cols-[28px_minmax(0,1fr)_104px]"><span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><span /></div></div>
-      <div className={cn("sticky top-0 z-10 hidden border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:grid", desktopGridClass)}>
+    <section className="min-h-0 flex-1 overflow-hidden rounded-xl border border-[#dce7dc] bg-white shadow-sm">
+      <div className="border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:hidden"><div className="grid grid-cols-[28px_minmax(0,1fr)_104px]"><span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><span /></div></div>
+      <div className={cn("hidden border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:grid", desktopGridClass)}>
         <span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><SortButton label="大小" active={sort === "size"} direction={direction} onClick={() => onSort("size")} /><SortButton label="修改时间" active={sort === "modified"} direction={direction} onClick={() => onSort("modified")} /><span />
       </div>
+      <div className="min-h-0 h-full overflow-y-auto" style={{ scrollbarGutter: "stable" }}>
       {items.length === 0 && <div className="flex h-32 items-center justify-center text-sm text-[#829488]">当前目录没有内容</div>}
       {items.map((item) => item.kind === "folder" ? (
         <div key={item.name} className="cursor-pointer border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]" onClick={() => onOpenFolder(item.name)}>
-          <div className="grid grid-cols-[28px_minmax(0,1fr)_104px] items-center sm:hidden"><span /><FileName item={item} /><span /></div>
-          <div className={cn("hidden items-center sm:grid", desktopGridClass)}><span /><FileName item={item} /><span /><span /><span /></div>
+          <div className="grid grid-cols-[28px_minmax(0,1fr)_104px] items-center sm:hidden"><span /><FileName item={item} /><FileActions item={item} deleting={deleting} onPreview={onPreview} onDownload={onDownload} onDelete={onDelete} /></div>
+          <div className={cn("hidden items-center sm:grid", desktopGridClass)}><span /><FileName item={item} /><span /><span /><FileActions item={item} deleting={deleting} onPreview={onPreview} onDownload={onDownload} onDelete={onDelete} /></div>
         </div>
       ) : (
         <div key={item.name} className="cursor-pointer border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]" onClick={() => onDownload(item.name)}>
@@ -107,6 +108,7 @@ export function FileTable({ items, selected, deleting, sort, direction, onSort, 
           </div>
         </div>
       ))}
+      </div>
     </section>
   );
 }

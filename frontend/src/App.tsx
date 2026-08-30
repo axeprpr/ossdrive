@@ -28,6 +28,7 @@ export default function App() {
   const [preview, setPreview] = useState<PreviewData | null>(null);
   const [mkdirOpen, setMkdirOpen] = useState(false);
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ name: string; kind: "file" | "folder" } | null>(null);
   const [mkdirName, setMkdirName] = useState("");
   const [uploading, setUploading] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -71,10 +72,10 @@ export default function App() {
     setPage(1);
   }
 
-  async function remove(name: string) {
+  async function remove(name: string, kind: "file" | "folder" = "file") {
     setDeleting(name);
     try {
-      await postJson("/api/delete", { name: fullName(name) });
+      await postJson("/api/delete", { name: fullName(name), kind });
       await load(true);
     } catch (error) {
       showError(error);
@@ -180,13 +181,13 @@ export default function App() {
           </a>
         </header>
 
-        <section className="mb-3 flex h-16 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-dashed border-[#b8cbb9] bg-white/60 px-3 text-center text-sm shadow-sm" onClick={() => fileInput.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); if (event.dataTransfer.files.length) void upload(event.dataTransfer.files); }}>
+        <section className="mb-3 flex h-24 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-dashed border-[#b8cbb9] bg-white/60 px-3 text-center text-sm shadow-sm" onClick={() => fileInput.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); if (event.dataTransfer.files.length) void upload(event.dataTransfer.files); }}>
           <input ref={fileInput} hidden type="file" multiple onChange={(event) => event.target.files && void upload(event.target.files)} />
           <span className="max-w-full truncate">{uploading || "点击或拖拽文件上传"}</span>
         </section>
 
         <div className="mb-2 flex min-w-0 shrink-0 items-center gap-2">
-          <button className="max-w-40 truncate px-1 text-sm text-[#5d8067] hover:text-[#376044]" title={path || "根目录"} onClick={() => { setPath(""); setPage(1); }}>{path || "根目录"}</button>
+          <IconButton label="返回上一级" disabled={!path} onClick={() => { setPath(path.split("/").slice(0, -1).join("/")); setPage(1); }}><ArrowLeft className="h-[18px] w-[18px]" /></IconButton>
           <div className="relative min-w-24 max-w-[260px] flex-1">
             <Search className="absolute left-2 top-2 h-4 w-4 text-[#8fa493]" />
             <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="搜索" className="h-8 w-full rounded-md border border-[#cfdfd0] bg-[#fffffc] pl-8 pr-7 text-xs outline-none focus:border-[#8fb398] focus:ring-2 focus:ring-[#dcecdc]" />
@@ -199,9 +200,11 @@ export default function App() {
           <IconButton label="新建目录" onClick={() => setMkdirOpen(true)}><FolderPlus className="h-[18px] w-[18px]" /></IconButton>
         </div>
 
-        <FileTable items={listing.items} selected={selected} deleting={deleting} sort={sort} direction={direction} onSort={sortBy} onOpenFolder={(name) => { setPath(fullName(name)); setPage(1); }} onToggle={(name, checked) => { const next = new Set(selected); checked ? next.add(name) : next.delete(name); setSelected(next); }} onPreview={(name) => void openPreview(name)} onDownload={(name) => { location.href = downloadUrl(name); }} onDelete={(name) => void remove(name)} />
+        <FileTable items={listing.items} selected={selected} deleting={deleting} sort={sort} direction={direction} onSort={sortBy} onOpenFolder={(name) => { setPath(fullName(name)); setPage(1); }} onToggle={(name, checked) => { const next = new Set(selected); checked ? next.add(name) : next.delete(name); setSelected(next); }} onPreview={(name) => void openPreview(name)} onDownload={(name) => { location.href = downloadUrl(name); }} onDelete={(name, kind = "file") => kind === "folder" ? setDeleteTarget({ name, kind }) : void remove(name)} />
 
-        <footer className="flex shrink-0 items-center justify-center gap-2 pt-3 sm:gap-3">
+        <footer className="flex shrink-0 items-center justify-between gap-2 pt-3 sm:gap-3">
+          <span className="min-w-0 max-w-[35%] truncate text-xs text-[#829488]" title={path || "根目录"}>{path || "根目录"}</span>
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
           <Select value={String(pageSize)} onValueChange={(value) => { setPageSize(Number(value)); setPage(1); }}>
             <SelectTrigger aria-label="每页数量"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="10">10 条/页</SelectItem><SelectItem value="30">30 条/页</SelectItem><SelectItem value="50">50 条/页</SelectItem></SelectContent>
@@ -209,6 +212,7 @@ export default function App() {
           <IconButton label="上一页" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}><ArrowLeft className="h-[18px] w-[18px]" /></IconButton>
           <span className="min-w-24 text-center text-xs text-[#718c78]">{Math.min(page, pages)} / {pages} · 共 {listing.total} 项</span>
           <IconButton label="下一页" disabled={page >= pages} onClick={() => setPage((value) => value + 1)}><ArrowRight className="h-[18px] w-[18px]" /></IconButton>
+          </div>
         </footer>
       </main>
 
@@ -225,6 +229,14 @@ export default function App() {
           <AlertDialogTitle className="text-base font-semibold">确认批量删除</AlertDialogTitle>
           <AlertDialogDescription className="mt-2 text-sm text-[#718c78]">将删除选中的 {selected.size} 个文件，此操作无法撤销。</AlertDialogDescription>
           <AlertDialogFooter><AlertDialogCancel>取消</AlertDialogCancel><AlertDialogAction onClick={() => void batchDelete()}>删除</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogTitle className="text-base font-semibold">确认删除目录</AlertDialogTitle>
+          <AlertDialogDescription className="mt-2 text-sm text-[#718c78]">将删除目录“{deleteTarget?.name}”以及目录下的所有内容，此操作无法撤销。</AlertDialogDescription>
+          <AlertDialogFooter><AlertDialogCancel>取消</AlertDialogCancel><AlertDialogAction onClick={() => { if (deleteTarget) void remove(deleteTarget.name, "folder"); setDeleteTarget(null); }}>删除目录</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
