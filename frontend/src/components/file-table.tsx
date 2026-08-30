@@ -72,10 +72,7 @@ export function FileTable({ items, selected, deleting, sort, direction, onSort, 
 }) {
   return (
     <section className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[#dce7dc] bg-white shadow-sm" style={{ scrollbarGutter: "stable" }}>
-      <div className="sticky top-0 z-10 border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:hidden">
-        <div className="grid grid-cols-[28px_minmax(0,1fr)_104px]"><span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><span /></div>
-        <div className="mt-1 flex gap-5 pl-7"><SortButton label="大小" active={sort === "size"} direction={direction} onClick={() => onSort("size")} /><SortButton label="修改时间" active={sort === "modified"} direction={direction} onClick={() => onSort("modified")} /></div>
-      </div>
+      <div className="sticky top-0 z-10 border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:hidden"><div className="grid grid-cols-[28px_minmax(0,1fr)_104px]"><span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><span /></div></div>
       <div className={cn("sticky top-0 z-10 hidden border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:grid", desktopGridClass)}>
         <span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><SortButton label="大小" active={sort === "size"} direction={direction} onClick={() => onSort("size")} /><SortButton label="修改时间" active={sort === "modified"} direction={direction} onClick={() => onSort("modified")} /><span />
       </div>
@@ -91,7 +88,6 @@ export function FileTable({ items, selected, deleting, sort, direction, onSort, 
             <span onClick={(event) => event.stopPropagation()}><Checkbox checked={selected.has(item.name)} onCheckedChange={(checked) => onToggle(item.name, checked === true)} /></span>
             <FileName item={item} />
             <FileActions item={item} deleting={deleting} onPreview={onPreview} onDownload={onDownload} onDelete={onDelete} />
-            <span className="col-span-2 col-start-2 mt-1 flex gap-3 truncate text-[11px] text-[#718c78]"><span>{formatSize(item.size)}</span><span className="truncate" title={new Date(item.modified).toLocaleString()}>{new Date(item.modified).toLocaleString()}</span></span>
           </div>
           <div className={cn("hidden items-center sm:grid", desktopGridClass)}>
             <span onClick={(event) => event.stopPropagation()}><Checkbox checked={selected.has(item.name)} onCheckedChange={(checked) => onToggle(item.name, checked === true)} /></span>
