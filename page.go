@@ -4,9 +4,10 @@ import (
 	"embed"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
-//go:embed page.html app.js assets/logo.svg
+//go:embed page.html app.js assets/logo.svg assets/marked.min.js assets/purify.min.js
 var pageFiles embed.FS
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -44,5 +45,21 @@ func script(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
+	_, _ = w.Write(data)
+}
+
+func vendor(w http.ResponseWriter, r *http.Request) {
+	name := strings.TrimPrefix(r.URL.Path, "/vendor/")
+	if name != "marked.min.js" && name != "purify.min.js" {
+		http.NotFound(w, r)
+		return
+	}
+	data, err := pageFiles.ReadFile("assets/" + name)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 	_, _ = w.Write(data)
 }

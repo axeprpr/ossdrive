@@ -22,6 +22,7 @@ func (a *app) routes() *http.ServeMux {
 	mux.HandleFunc("/skills.md", skills)
 	mux.HandleFunc("/logo.svg", logo)
 	mux.HandleFunc("/app.js", script)
+	mux.HandleFunc("/vendor/", vendor)
 	mux.HandleFunc("/health", health)
 	mux.HandleFunc("/api/list", a.list)
 	mux.HandleFunc("/api/upload-url", a.uploadURL)
