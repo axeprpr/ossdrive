@@ -80,12 +80,12 @@ export function FileTable({ items, selected, deleting, sort, direction, onSort, 
   onDelete: (name: string, kind?: "file" | "folder") => void;
 }) {
   return (
-    <section className="min-h-0 flex-1 overflow-hidden rounded-xl border border-[#dce7dc] bg-white shadow-sm">
+    <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#dce7dc] bg-white shadow-sm">
       <div className="border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:hidden"><div className="grid grid-cols-[28px_minmax(0,1fr)_104px]"><span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><span /></div></div>
       <div className={cn("hidden border-b border-[#dce7dc] bg-[#f4f8f2] px-3 py-2 text-xs font-semibold text-[#68786c] sm:grid", desktopGridClass)}>
         <span /><SortButton label="名称" active={sort === "name"} direction={direction} onClick={() => onSort("name")} /><SortButton label="大小" active={sort === "size"} direction={direction} onClick={() => onSort("size")} /><SortButton label="修改时间" active={sort === "modified"} direction={direction} onClick={() => onSort("modified")} /><span />
       </div>
-      <div className="drive-scrollbar min-h-0 h-full overflow-y-auto" style={{ scrollbarGutter: "stable" }}>
+      <div className="drive-scrollbar min-h-0 flex-1 overflow-y-auto" style={{ scrollbarGutter: "stable" }}>
       {items.length === 0 && <div className="flex h-32 items-center justify-center text-sm text-[#829488]">当前目录没有内容</div>}
       {items.map((item) => item.kind === "folder" ? (
         <div key={item.name} className="cursor-pointer border-b border-[#edf2ec] px-3 py-2 text-sm hover:bg-[#f3f8f1]" onClick={() => onOpenFolder(item.name)}>
