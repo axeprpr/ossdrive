@@ -183,7 +183,7 @@ export default function App() {
           </a>
         </header>
 
-        <section className="mb-3 flex h-24 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-dashed border-[#b8cbb9] bg-white/60 px-3 text-center text-sm shadow-sm" onClick={() => fileInput.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); if (event.dataTransfer.files.length) void upload(event.dataTransfer.files); }}>
+        <section className="mb-3 flex h-16 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-dashed border-[#b8cbb9] bg-white/60 px-3 text-center text-sm shadow-sm" onClick={() => fileInput.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); if (event.dataTransfer.files.length) void upload(event.dataTransfer.files); }}>
           <input ref={fileInput} hidden type="file" multiple onChange={(event) => event.target.files && void upload(event.target.files)} />
           <span className="max-w-full truncate">{uploading || "点击或拖拽文件上传"}</span>
         </section>

@@ -10,10 +10,11 @@ button, input, select { font: inherit; }
   scrollbar-color: #a9c7ad transparent;
 }
 .drive-scrollbar::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 .drive-scrollbar::-webkit-scrollbar-track {
   background: transparent;
+  margin-block: 12px;
 }
 .drive-scrollbar::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
