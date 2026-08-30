@@ -193,10 +193,10 @@ export default function App() {
             {query && <button aria-label="清除搜索" className="absolute right-1.5 top-1.5 rounded p-0.5 text-[#829488] hover:bg-[#edf6eb]" onClick={() => setQuery("")}><X className="h-4 w-4" /></button>}
           </div>
           <span className="ml-auto hidden whitespace-nowrap text-xs text-[#829488] md:block">{formatSize(listing.usage)} / 500 GB</span>
-          <IconButton label="刷新" disabled={loading} onClick={() => void load(true)}><RefreshCw className={`h-[18px] w-[18px] ${loading ? "animate-spin" : ""}`} /></IconButton>
-          <IconButton label="新建目录" onClick={() => setMkdirOpen(true)}><FolderPlus className="h-[18px] w-[18px]" /></IconButton>
           <IconButton label="批量下载" disabled={!selected.size} onClick={batchDownload}><Download className="h-[18px] w-[18px]" /></IconButton>
           <IconButton label="批量删除" variant="destructive" disabled={!selected.size} onClick={() => setBatchDeleteOpen(true)}><Trash2 className="h-[18px] w-[18px]" /></IconButton>
+          <IconButton label="刷新目录" disabled={loading} onClick={() => void load(true)}><RefreshCw className={`h-[18px] w-[18px] ${loading ? "animate-spin" : ""}`} /></IconButton>
+          <IconButton label="新建目录" onClick={() => setMkdirOpen(true)}><FolderPlus className="h-[18px] w-[18px]" /></IconButton>
         </div>
 
         <FileTable items={listing.items} selected={selected} deleting={deleting} sort={sort} direction={direction} onSort={sortBy} onOpenFolder={(name) => { setPath(fullName(name)); setPage(1); }} onToggle={(name, checked) => { const next = new Set(selected); checked ? next.add(name) : next.delete(name); setSelected(next); }} onPreview={(name) => void openPreview(name)} onDownload={(name) => { location.href = downloadUrl(name); }} onDelete={(name) => void remove(name)} />
